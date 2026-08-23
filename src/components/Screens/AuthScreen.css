@@ -1,0 +1,392 @@
+/* AuthScreen.css - Refined Modal UX */
+
+.auth-master-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100vw;
+  position: relative;
+  overflow: hidden;
+  background-color: #fafafa;
+  font-family: var(--font-main);
+  padding: 1rem;
+}
+
+/* --- THE CLEAN BACKGROUND SYSTEM (Phase 1 Only) --- */
+.bg-system {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 1;
+}
+
+.bg-phase {
+  position: absolute;
+  inset: 0;
+}
+
+.bg-layer-tribal {
+  background-image: url('/assets/img3.jpg');
+  background-size: 350px; 
+  background-repeat: repeat;
+}
+
+/* The faint overlay film */
+.bg-layer-tribal .faint-layer {
+  position: absolute; inset: 0;
+  background-color: white; 
+  opacity: 0.85; 
+}
+
+/* Drawing line sweep */
+.bg-layer-tribal .draw-layer {
+  position: absolute; inset: 0;
+  background-image: inherit;
+  background-size: inherit;
+  background-repeat: inherit;
+  mask-image: linear-gradient(110deg, transparent 10%, black 30%, black 70%, transparent 90%);
+  -webkit-mask-image: linear-gradient(110deg, transparent 10%, black 30%, black 70%, transparent 90%);
+  mask-size: 300% 300%;
+  -webkit-mask-size: 300% 300%;
+  animation: traceSweep 15s linear infinite;
+}
+
+@keyframes traceSweep {
+  0%   { mask-position: 200% 200%; -webkit-mask-position: 200% 200%; }
+  100% { mask-position: -100% -100%; -webkit-mask-position: -100% -100%; }
+}
+
+
+/* --- THE ELEGANT MODAL WITH RED ANIMATED BORDER --- */
+.auth-modal-wrapper {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 480px; 
+  background: white; 
+  border-radius: 36px;
+  
+  /* Animated gradient border using the app's primary color */
+  padding: 3px;
+  background: linear-gradient(
+    45deg, 
+    var(--primary), 
+    rgba(var(--primary-rgb, 200,0,0), 0.2), 
+    var(--primary), 
+    transparent
+  );
+  background-size: 300% 300%;
+  animation: coloredBorderPulse 6s ease infinite;
+  
+  box-shadow: 
+    0 40px 80px rgba(0, 0, 0, 0.15), 
+    0 0 0 1px rgba(0, 0, 0, 0.05);
+  transition: max-width 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s ease;
+}
+
+.auth-modal-wrapper.signup-mode {
+  max-width: 580px;
+}
+
+@keyframes coloredBorderPulse {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* --- MODAL INNER CONTENT (Hides Scrollbar) --- */
+.auth-modal-content {
+  position: relative;
+  background: white;
+  border-radius: 34px; 
+  z-index: 2;
+  padding: 3.5rem 3rem; 
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  overflow-y: auto;
+  
+  /* Hiding scrollbar */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.auth-modal-content::-webkit-scrollbar {
+  display: none;
+}
+
+/* --- NEW TRIBAL RING WATERMARK (img8.jpg) --- */
+.modal-motif-container {
+  position: absolute;
+  top: 3px; left: 3px; right: 3px; bottom: 3px; 
+  border-radius: 34px;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+  background: white; 
+}
+
+.motif-watermark {
+  position: absolute;
+  width: 160%; /* Make it large enough to cover background */
+  height: 160%;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: var(--primary); /* Tints the extracted motif */
+  mask-image: url('/assets/img8.jpg');
+  -webkit-mask-image: url('/assets/img8.jpg');
+  mask-size: contain;
+  -webkit-mask-size: contain;
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-position: center;
+  opacity: 0.01; /* Extremely subtle watermark */
+  animation: slowWatermarkSpin 120s linear infinite; /* Very slow rotation */
+}
+
+@keyframes slowWatermarkSpin {
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+
+/* --- WOW EFFECT 3D CUBE ANIMATION WITH DUAL FONT LOGO --- */
+.logo-text-anim-container {
+  width: 85px; 
+  height: 85px;
+  margin: 0 auto 3rem auto;
+  perspective: 1200px;
+  transition: transform 0.5s ease;
+  z-index: 10;
+}
+
+.logo-text-anim-container.small-cube {
+  transform: scale(0.75);
+  margin-bottom: 2rem;
+}
+
+.cube-spinner {
+  width: 100%; 
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  animation: wowCubeSpin 10s cubic-bezier(0.77, 0, 0.175, 1) infinite;
+}
+
+.cube-face {
+  position: absolute;
+  width: 100%; 
+  height: 100%;
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  backface-visibility: hidden;
+}
+
+.face-front { transform: rotateX(0deg) translateZ(42px); }
+.cube-logo { width: 85px; height: 85px; object-fit: contain; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.1)); }
+
+.face-bottom { transform: rotateX(-90deg) translateZ(42px); background: transparent; }
+
+/* The Dual Font Logo Text */
+.cube-text { 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0; 
+  letter-spacing: -1px; 
+  text-shadow: 0 4px 12px rgba(var(--primary-rgb, 200,0,0), 0.1); 
+  white-space: nowrap;
+}
+
+.logo-text-obs {
+  font-family: 'Georgia', 'Times New Roman', serif; /* Different font for OBS */
+  font-style: italic;
+  font-size: 2.3rem;
+  font-weight: 800;
+  color: #111111; /* Black */
+}
+
+.logo-text-med {
+  font-family: var(--font-display); /* App default font for MED */
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--primary); /* App default color */
+}
+
+@keyframes wowCubeSpin {
+  0%, 40% { transform: rotateX(0deg); }
+  45%, 90% { transform: rotateX(90deg); }
+  95%, 100% { transform: rotateX(360deg); }
+}
+
+
+/* --- FORM ELEMENTS --- */
+.auth-form-elements {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  z-index: 10;
+}
+
+.signup-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.signup-grid .full-width { grid-column: span 2; }
+
+.input-group label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 0.5rem;
+}
+
+.input-field-wrapper { position: relative; }
+
+.input-icon {
+  position: absolute;
+  left: 1.2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  transition: color 0.3s;
+  pointer-events: none;
+}
+
+.input-field-wrapper input,
+.auth-select {
+  width: 100%;
+  padding: 1rem 1rem 1rem 3.2rem;
+  background: var(--surface);
+  border: 2px solid transparent;
+  border-radius: 18px;
+  color: var(--text-main);
+  font-size: 1rem;
+  font-family: var(--font-main);
+  transition: all 0.3s ease;
+  appearance: none;
+}
+
+.input-field-wrapper input:focus,
+.auth-select:focus {
+  outline: none;
+  background: white;
+  border-color: var(--primary);
+  box-shadow: 0 4px 20px rgba(var(--primary-rgb, 200,0,0), 0.1);
+}
+
+.input-field-wrapper input:focus + .input-icon,
+.select-wrapper:focus-within .input-icon {
+  color: var(--primary);
+}
+
+/* Buttons */
+.btn-primary-auth {
+  margin-top: 1rem;
+  width: 100%;
+  padding: 1.1rem;
+  background: var(--primary);
+  border: none;
+  border-radius: 18px;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 20px rgba(var(--primary-rgb, 0,0,0), 0.25);
+}
+
+.dashboard-hover:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+  box-shadow: 0 8px 30px rgba(var(--primary-rgb, 0,0,0), 0.35);
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 1.8rem 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  z-index: 10;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.auth-divider span { padding: 0 1rem; }
+
+.btn-google-auth {
+  width: 100%;
+  padding: 1rem;
+  background: white;
+  border: 1px solid var(--surface-border);
+  border-radius: 18px;
+  color: var(--text-main);
+  font-size: 1.05rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  z-index: 10;
+  position: relative;
+}
+
+.toggle-wrapper {
+  margin-top: 1.8rem;
+  text-align: center;
+  z-index: 10;
+  position: relative;
+}
+
+.btn-toggle-auth {
+  background: transparent;
+  border: none;
+  color: var(--primary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+}
+
+.btn-toggle-auth:hover {
+  opacity: 0.8;
+  text-decoration-color: var(--primary);
+}
+
+.auth-error-alert {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  text-align: center;
+  z-index: 10;
+  position: relative;
+}
+
+@media (max-width: 520px) {
+  .signup-grid { grid-template-columns: 1fr; }
+  .signup-grid .full-width { grid-column: 1; }
+}

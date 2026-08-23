@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="100" fill="#f9f8f6"/>
+  <!-- Primary Color Cross Base -->
+  <rect x="216" y="100" width="80" height="312" rx="20" fill="#9b7a5a"/>
+  <rect x="100" y="216" width="312" height="80" rx="20" fill="#9b7a5a"/>
+  <!-- White accents -->
+  <path d="M 230 230 L 282 230 L 282 282 L 230 282 Z" fill="#ffffff" opacity="0.3"/>
+  <circle cx="256" cy="256" r="16" fill="#ffffff"/>
+</svg>
