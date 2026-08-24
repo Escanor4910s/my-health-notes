@@ -288,7 +288,7 @@ function ExportSection({ data }) {
     <div className="animate-fade-in glass-panel" style={{ 
       padding: '4rem 3rem', 
       textAlign: 'center',
-      maxWidth: '900px',
+      maxWidth: '1000px', // Wider to fit 3 cards comfortably
       margin: '0 auto',
       background: 'var(--surface)',
       borderRadius: '24px',
@@ -304,77 +304,105 @@ function ExportSection({ data }) {
         Votre dossier clinique est complet. Choisissez le format d'exportation qui convient le mieux à vos besoins.
       </p>
 
-      <div style={{ 
-        display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
-        gap: '1.5rem', 
-        justifyContent: 'center' 
-      }}>
+      {/* Embedded CSS for responsive grid and hover effects without inline JS mess */}
+      <style dangerouslySetInnerHTML={{__html: `
+        .export-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1.5rem;
+          justify-content: center;
+        }
+        @media (max-width: 768px) {
+          .export-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+        .export-card-premium {
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 1rem;
+          padding: 2rem 1.5rem;
+          border-radius: 20px;
+          border: 1px solid var(--surface-border);
+          background: var(--surface-bg);
+          cursor: pointer;
+          transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+          box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+          overflow: hidden;
+        }
+        .export-card-premium::before {
+          content: "";
+          position: absolute;
+          top: 0; left: 0; right: 0;
+          height: 3px;
+          background: var(--primary);
+          transform: scaleX(0);
+          transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+          transform-origin: left;
+        }
+        .export-card-premium:hover {
+          transform: translateY(-8px);
+          box-shadow: 0 20px 40px -10px rgba(0,0,0,0.12);
+          border-color: transparent;
+        }
+        .export-card-premium:hover::before {
+          transform: scaleX(1);
+        }
+        .export-card-premium:hover .card-title {
+          color: var(--primary);
+        }
+        .export-card-premium:hover .card-icon-wrapper {
+          transform: scale(1.1);
+        }
+        .card-icon-wrapper {
+          width: 64px; height: 64px;
+          border-radius: 16px;
+          display: flex; align-items: center; justify-content: center;
+          transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .card-title {
+          margin: 0 0 0.5rem 0;
+          font-size: 1.15rem;
+          font-weight: 700;
+          color: var(--text-main);
+          transition: color 0.3s;
+        }
+      `}} />
+
+      <div className="export-grid">
         {/* PDF Card */}
-        <button 
-          onClick={downloadPDF} 
-          className="export-card"
-          style={{
-            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem',
-            padding: '2rem 1.5rem', borderRadius: '20px', border: '1px solid var(--surface-border)',
-            background: 'var(--surface-bg)', cursor: 'pointer', transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-            boxShadow: '0 4px 15px rgba(0,0,0,0.03)'
-          }}
-          onMouseOver={e => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = '0 15px 35px -10px rgba(0,0,0,0.1)'; e.currentTarget.style.borderColor = 'var(--primary)'; }}
-          onMouseOut={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.03)'; e.currentTarget.style.borderColor = 'var(--surface-border)'; }}
-        >
-          <div style={{ width: '64px', height: '64px', borderRadius: '16px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <button onClick={downloadPDF} className="export-card-premium">
+          <div className="card-icon-wrapper" style={{ background: 'rgba(239, 68, 68, 0.08)', color: '#ef4444' }}>
             <Download size={28} strokeWidth={2} />
           </div>
           <div>
-            <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.15rem', fontWeight: '700', color: 'var(--text-main)' }}>Format PDF</h3>
+            <h3 className="card-title">Format PDF</h3>
             <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.4' }}>Idéal pour le partage et l'impression directe.</span>
           </div>
         </button>
 
         {/* Word Card */}
-        <button 
-          onClick={downloadWord} 
-          className="export-card"
-          style={{
-            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem',
-            padding: '2rem 1.5rem', borderRadius: '20px', border: '1px solid var(--surface-border)',
-            background: 'var(--surface-bg)', cursor: 'pointer', transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-            boxShadow: '0 4px 15px rgba(0,0,0,0.03)'
-          }}
-          onMouseOver={e => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = '0 15px 35px -10px rgba(0,0,0,0.1)'; e.currentTarget.style.borderColor = 'var(--primary)'; }}
-          onMouseOut={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.03)'; e.currentTarget.style.borderColor = 'var(--surface-border)'; }}
-        >
-          <div style={{ width: '64px', height: '64px', borderRadius: '16px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <button onClick={downloadWord} className="export-card-premium">
+          <div className="card-icon-wrapper" style={{ background: 'rgba(59, 130, 246, 0.08)', color: '#3b82f6' }}>
             <FileText size={28} strokeWidth={2} />
           </div>
           <div>
-            <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.15rem', fontWeight: '700', color: 'var(--text-main)' }}>Format Word</h3>
+            <h3 className="card-title">Format Word</h3>
             <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.4' }}>Idéal si vous souhaitez retoucher le document.</span>
           </div>
         </button>
 
-        {/* AI Export Card */}
-        <button 
-          onClick={exportAI} 
-          disabled={aiLoading} 
-          className="export-card"
-          style={{
-            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem',
-            padding: '2rem 1.5rem', borderRadius: '20px', border: '1px solid var(--primary)',
-            background: 'linear-gradient(145deg, var(--surface), var(--surface-bg))', cursor: aiLoading ? 'wait' : 'pointer', transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-            boxShadow: '0 10px 30px -10px rgba(var(--primary-rgb, 155,122,90), 0.3)'
-          }}
-          onMouseOver={e => { if(!aiLoading) { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = '0 20px 40px -10px rgba(var(--primary-rgb, 155,122,90), 0.4)'; } }}
-          onMouseOut={e => { if(!aiLoading) { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 10px 30px -10px rgba(var(--primary-rgb, 155,122,90), 0.3)'; } }}
-        >
-          <div style={{ width: '64px', height: '64px', borderRadius: '16px', background: 'linear-gradient(135deg, var(--primary), #d4af37)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 15px rgba(var(--primary-rgb, 155,122,90), 0.4)' }}>
-            {aiLoading ? <Loader2 size={28} className="animate-spin" /> : <Sparkles size={28} strokeWidth={2} />}
+        {/* Humanized AI Export Card (Disguised) */}
+        <button onClick={exportAI} disabled={aiLoading} className="export-card-premium" style={{ cursor: aiLoading ? 'wait' : 'pointer', opacity: aiLoading ? 0.7 : 1 }}>
+          <div className="card-icon-wrapper" style={{ background: 'rgba(16, 185, 129, 0.08)', color: '#10b981' }}>
+            {aiLoading ? <Loader2 size={28} className="animate-spin" /> : <FileText size={28} strokeWidth={2} />}
           </div>
           <div>
-            <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.15rem', fontWeight: '700', color: 'var(--primary)' }}>Synthèse Assistée</h3>
+            <h3 className="card-title">Rapport d'Expert</h3>
             <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.4' }}>
-              {aiLoading ? "Génération en cours..." : "L'assistant compile un rapport parfait."}
+              {aiLoading ? "Génération en cours..." : "Génération d'une synthèse clinique optimisée."}
             </span>
           </div>
         </button>
