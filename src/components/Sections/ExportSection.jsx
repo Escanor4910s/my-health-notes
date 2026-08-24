@@ -14,6 +14,9 @@ const listChecked = (data, mapping) => {
 const val = (obj, key) => obj?.[key] || '';
 
 function ExportSection({ data }) {
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState('');
+
 
   const generateHTMLContent = () => {
     const ec = data['etat-civil'] || {};
