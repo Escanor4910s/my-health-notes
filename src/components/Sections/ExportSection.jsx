@@ -285,34 +285,106 @@ function ExportSection({ data }) {
   };
 
   return (
-    <div className="animate-fade-in glass-panel" style={{ padding: '4rem 3rem', textAlign: 'center' }}>
-      <header className="section-header" style={{ borderBottom: 'none', marginBottom: '1.5rem' }}>
-        <h2>Télécharger l'observation</h2>
+    <div className="animate-fade-in glass-panel" style={{ 
+      padding: '4rem 3rem', 
+      textAlign: 'center',
+      maxWidth: '900px',
+      margin: '0 auto',
+      background: 'var(--surface)',
+      borderRadius: '24px',
+      boxShadow: '0 20px 40px -10px rgba(0,0,0,0.05)'
+    }}>
+      <header className="section-header" style={{ borderBottom: 'none', marginBottom: '1.5rem', justifyContent: 'center' }}>
+        <h2 style={{ fontSize: '2rem', fontWeight: '800', background: 'linear-gradient(135deg, var(--primary), var(--text-main))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+          Finaliser l'Observation
+        </h2>
       </header>
       
-      <p style={{ color: 'var(--text-muted)', marginBottom: '3rem', fontSize: '0.95rem', maxWidth: '500px', margin: '0 auto 3rem' }}>
-        Votre observation médicale est prête. Choisissez le format de téléchargement.
+      <p style={{ color: 'var(--text-muted)', marginBottom: '3.5rem', fontSize: '1.1rem', maxWidth: '600px', margin: '0 auto 3.5rem', lineHeight: '1.6' }}>
+        Votre dossier clinique est complet. Choisissez le format d'exportation qui convient le mieux à vos besoins.
       </p>
 
-      <div style={{ display: 'flex', gap: '1.5rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-        <button onClick={downloadWord} className="btn btn-primary">
-          <FileText size={20} />
-          Télécharger en Word
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', 
+        gap: '1.5rem', 
+        justifyContent: 'center' 
+      }}>
+        {/* PDF Card */}
+        <button 
+          onClick={downloadPDF} 
+          className="export-card"
+          style={{
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem',
+            padding: '2rem 1.5rem', borderRadius: '20px', border: '1px solid var(--surface-border)',
+            background: 'var(--surface-bg)', cursor: 'pointer', transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+            boxShadow: '0 4px 15px rgba(0,0,0,0.03)'
+          }}
+          onMouseOver={e => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = '0 15px 35px -10px rgba(0,0,0,0.1)'; e.currentTarget.style.borderColor = 'var(--primary)'; }}
+          onMouseOut={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.03)'; e.currentTarget.style.borderColor = 'var(--surface-border)'; }}
+        >
+          <div style={{ width: '64px', height: '64px', borderRadius: '16px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Download size={28} strokeWidth={2} />
+          </div>
+          <div>
+            <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.15rem', fontWeight: '700', color: 'var(--text-main)' }}>Format PDF</h3>
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.4' }}>Idéal pour le partage et l'impression directe.</span>
+          </div>
         </button>
 
-        <button onClick={downloadPDF} className="btn btn-secondary">
-          <Download size={20} />
-          Exporter en PDF
+        {/* Word Card */}
+        <button 
+          onClick={downloadWord} 
+          className="export-card"
+          style={{
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem',
+            padding: '2rem 1.5rem', borderRadius: '20px', border: '1px solid var(--surface-border)',
+            background: 'var(--surface-bg)', cursor: 'pointer', transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+            boxShadow: '0 4px 15px rgba(0,0,0,0.03)'
+          }}
+          onMouseOver={e => { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = '0 15px 35px -10px rgba(0,0,0,0.1)'; e.currentTarget.style.borderColor = 'var(--primary)'; }}
+          onMouseOut={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.03)'; e.currentTarget.style.borderColor = 'var(--surface-border)'; }}
+        >
+          <div style={{ width: '64px', height: '64px', borderRadius: '16px', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <FileText size={28} strokeWidth={2} />
+          </div>
+          <div>
+            <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.15rem', fontWeight: '700', color: 'var(--text-main)' }}>Format Word</h3>
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.4' }}>Idéal si vous souhaitez retoucher le document.</span>
+          </div>
         </button>
 
-        <button onClick={exportAI} disabled={aiLoading} className="btn btn-secondary">
-          {aiLoading ? <Loader2 size={20} className="animate-spin" /> : <Sparkles size={20} />}
-          {aiLoading ? "Rédaction par l'IA..." : 'PDF rédigé par l\'IA'}
+        {/* AI Export Card */}
+        <button 
+          onClick={exportAI} 
+          disabled={aiLoading} 
+          className="export-card"
+          style={{
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem',
+            padding: '2rem 1.5rem', borderRadius: '20px', border: '1px solid var(--primary)',
+            background: 'linear-gradient(145deg, var(--surface), var(--surface-bg))', cursor: aiLoading ? 'wait' : 'pointer', transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+            boxShadow: '0 10px 30px -10px rgba(var(--primary-rgb, 155,122,90), 0.3)'
+          }}
+          onMouseOver={e => { if(!aiLoading) { e.currentTarget.style.transform = 'translateY(-5px)'; e.currentTarget.style.boxShadow = '0 20px 40px -10px rgba(var(--primary-rgb, 155,122,90), 0.4)'; } }}
+          onMouseOut={e => { if(!aiLoading) { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = '0 10px 30px -10px rgba(var(--primary-rgb, 155,122,90), 0.3)'; } }}
+        >
+          <div style={{ width: '64px', height: '64px', borderRadius: '16px', background: 'linear-gradient(135deg, var(--primary), #d4af37)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 15px rgba(var(--primary-rgb, 155,122,90), 0.4)' }}>
+            {aiLoading ? <Loader2 size={28} className="animate-spin" /> : <Sparkles size={28} strokeWidth={2} />}
+          </div>
+          <div>
+            <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.15rem', fontWeight: '700', color: 'var(--primary)' }}>Synthèse Assistée</h3>
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.4' }}>
+              {aiLoading ? "Génération en cours..." : "L'assistant compile un rapport parfait."}
+            </span>
+          </div>
         </button>
       </div>
 
-      {aiError && <p style={{ color: 'var(--danger)', marginTop: '1.5rem', fontSize: '0.9rem' }}>{aiError}</p>}
-
+      {aiError && (
+        <div style={{ marginTop: '2rem', padding: '1rem', background: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '12px', color: '#b91c1c', fontSize: '0.95rem', display: 'inline-block' }}>
+          {aiError}
+        </div>
+      )}
     </div>
   );
 }
