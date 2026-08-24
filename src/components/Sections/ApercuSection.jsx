@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
+import { Sparkles, Loader2, FileText } from 'lucide-react';
 import SymptomModal from '../UI/SymptomModal';
+import Markdown from '../UI/Markdown';
+import { askAI, compactDossier } from '../../lib/ai';
 
 function ApercuSection({ data }) {
   const d = (section, key) => data?.[section]?.[key];
@@ -7,6 +10,23 @@ function ApercuSection({ data }) {
   const Neant = () => <span style={{ color: 'var(--text-light)', fontStyle: 'italic' }}>Néant</span>;
 
   const [selectedSymptom, setSelectedSymptom] = useState(null);
+  const [aiContent, setAiContent] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState('');
+
+  const runAI = async (action) => {
+    setAiLoading(true);
+    setAiError('');
+    try {
+      const content = await askAI(action, { dossier: compactDossier(data) });
+      setAiContent(content);
+    } catch (e) {
+      setAiError(e.message);
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
 
   // Helper to parse narrative and highlight symptoms
   const renderHighlightedNarrative = (text, symptomes = []) => {
