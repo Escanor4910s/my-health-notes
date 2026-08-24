@@ -17,11 +17,19 @@ export default function AIAssistant({ formData }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(-1);
+  const [assistantName, setAssistantName] = useState('Copilote Clinique');
   const endRef = useRef(null);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
+
+  useEffect(() => {
+    if (open) {
+      const name = localStorage.getItem('obsmed-ai-name');
+      if (name) setAssistantName(name);
+    }
+  }, [open]);
 
   const run = async (action, userLabel, texte) => {
     if (loading) return;
@@ -61,7 +69,7 @@ export default function AIAssistant({ formData }) {
     <>
       <button
         onClick={() => setOpen((v) => !v)}
-        title="Copilote Clinique (8G)"
+        title={assistantName}
         style={{
           position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 60,
           width: '64px', height: '64px', borderRadius: '50%', border: 'none', cursor: 'pointer',
@@ -106,11 +114,11 @@ export default function AIAssistant({ formData }) {
             borderBottom: '1px solid var(--surface-border)', 
             display: 'flex', alignItems: 'center', gap: '0.75rem' 
           }}>
-            <div style={{ width: '36px', height: '36px', borderRadius: '12px', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', boxShadow: '0 4px 10px rgba(var(--primary-rgb, 0,0,0), 0.2)' }}>
-              <Stethoscope size={20} strokeWidth={2.5} />
+            <div style={{ width: '36px', height: '36px', borderRadius: '12px', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 10px rgba(0,0,0,0.08)', overflow: 'hidden', border: '1px solid var(--surface-border)' }}>
+              <img src={Logo8G} alt="AI" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
             </div>
             <div>
-              <strong style={{ fontSize: '1.05rem', color: 'var(--text-main)', letterSpacing: '-0.3px' }}>Copilote Clinique</strong>
+              <strong style={{ fontSize: '1.05rem', color: 'var(--text-main)', letterSpacing: '-0.3px' }}>{assistantName}</strong>
               <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '500' }}>Analyse contextuelle active</div>
             </div>
           </div>
