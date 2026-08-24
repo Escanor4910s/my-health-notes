@@ -8,6 +8,7 @@ export default function OCRScanner({ onScanComplete }) {
   const [isScanning, setIsScanning] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState('');
+  const [aiStep, setAiStep] = useState(false);
   const fileInputRef = useRef(null);
 
   const handleFileUpload = async (event) => {
