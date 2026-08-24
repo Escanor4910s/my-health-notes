@@ -19,6 +19,7 @@ import { NotificationProvider } from './components/UI/NotificationSystem';
 const TemplateSelector = lazy(() => import('./components/UI/TemplateSelector'));
 const VersionHistory = lazy(() => import('./components/UI/VersionHistory'));
 const AIAssistant = lazy(() => import('./components/UI/AIAssistant'));
+const AIEducationCard = lazy(() => import('./components/UI/AIEducationCard'));
 import SyncManager from './components/UI/SyncManager';
 import { saveVersionSnapshot, addToSyncQueue } from './lib/syncAndHistory';
 const EtatCivil = lazy(() => import('./components/Sections/EtatCivil'));
@@ -114,6 +115,13 @@ const SettingsSection = ({ accentTheme, bgTheme, setAccentTheme, setBgTheme }) =
     <div className="section-content fade-in" style={{ padding: '2rem' }}>
       <h2 style={{ fontSize: '1.6rem', color: 'var(--text-main)', marginBottom: '1.5rem', fontFamily: 'var(--font-display)', fontWeight: 600 }}>Paramètres</h2>
       
+      {/* AI EDUCATION */}
+      <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>Chargement...</div>}>
+        <AIEducationCard />
+      </Suspense>
+
+      <div style={{ height: '2rem' }} />
+
       {/* ACCENT THEMES */}
       <div className="form-card theme-section-card" style={{ padding: '2rem', background: 'var(--surface)', borderRadius: '16px', boxShadow: 'var(--shadow-sm)', marginBottom: '2rem', transition: 'all 0.3s' }}>
         <h3 style={{ marginTop: 0, marginBottom: '1.5rem', color: 'var(--text-main)', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
