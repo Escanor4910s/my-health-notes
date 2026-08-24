@@ -1,6 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { Camera, Upload, Loader2, X, Check } from 'lucide-react';
 import Tesseract from 'tesseract.js';
+import { askAI, parseJSONResponse } from '../../lib/ai';
+
 
 export default function OCRScanner({ onScanComplete }) {
   const [isScanning, setIsScanning] = useState(false);
