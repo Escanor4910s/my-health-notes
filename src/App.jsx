@@ -813,7 +813,12 @@ function AppContent() {
             />
           </Suspense>
         )}
+
+        <Suspense fallback={null}>
+          <AIAssistant formData={formData} />
+        </Suspense>
       </>
+
     );
 }
 
