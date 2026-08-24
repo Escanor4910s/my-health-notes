@@ -184,6 +184,34 @@ function ApercuSection({ data }) {
         <p style={{ color: 'var(--text-light)', letterSpacing: '0.05em', textTransform: 'uppercase', fontSize: '0.9rem', marginTop: '0.5rem' }}>Aperçu Final</p>
       </div>
 
+      {/* ANALYSE IA */}
+      <div className="apercu-page" style={{ borderLeft: '3px solid var(--primary)' }}>
+        <div className="apercu-page-title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <Sparkles size={18} /> Analyse IA du dossier
+        </div>
+        {!aiContent && !aiLoading && (
+          <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+            Laissez l'IA organiser les informations saisies, repérer les données manquantes et proposer une synthèse.
+          </p>
+        )}
+        {aiLoading && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)' }}>
+            <Loader2 size={16} className="animate-spin" /> Analyse du dossier en cours...
+          </div>
+        )}
+        {aiError && <p style={{ color: 'var(--danger)', fontSize: '0.9rem' }}>{aiError}</p>}
+        {aiContent && <Markdown content={aiContent} />}
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginTop: '1rem' }}>
+          <button className="btn btn-primary" disabled={aiLoading} onClick={() => runAI('apercu')}>
+            <Sparkles size={16} /> {aiContent ? 'Relancer l\'analyse' : 'Analyser avec l\'IA'}
+          </button>
+          <button className="btn btn-secondary" disabled={aiLoading} onClick={() => runAI('synthese')}>
+            <FileText size={16} /> Résumé syndromique
+          </button>
+        </div>
+      </div>
+
+
       {/* PAGE 1: IDENTITÉ */}
       <div className="apercu-page">
         <div className="apercu-page-title">1. Identité du patient</div>
