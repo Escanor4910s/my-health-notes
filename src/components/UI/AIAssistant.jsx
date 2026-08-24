@@ -67,28 +67,66 @@ export default function AIAssistant({ formData }) {
 
   return (
     <>
+      <style dangerouslySetInnerHTML={{__html: `
+        .widget-8g-btn {
+          position: fixed; bottom: 2rem; right: 2rem; z-index: 60;
+          width: 64px; height: 64px; border-radius: 50%; border: none; cursor: pointer;
+          box-shadow: 0 10px 25px -5px rgba(var(--primary-rgb, 0,0,0), 0.4), 0 8px 10px -6px rgba(var(--primary-rgb, 0,0,0), 0.2);
+          transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+          padding: 0;
+          background: #fff;
+          display: flex; align-items: center; justify-content: center;
+        }
+        .widget-8g-btn:hover {
+          transform: scale(1.05) translateY(-4px);
+          box-shadow: 0 15px 35px -5px rgba(var(--primary-rgb, 0,0,0), 0.5), 0 10px 15px -5px rgba(var(--primary-rgb, 0,0,0), 0.3);
+        }
+        .widget-8g-btn.is-open {
+          background: var(--primary);
+          transform: scale(0.9);
+        }
+        .widget-layer {
+          position: absolute; inset: 0; border-radius: 50%;
+          transition: opacity 0.5s ease;
+          display: flex; align-items: center; justify-content: center;
+          overflow: hidden;
+        }
+        /* Base Layer: White Bg, Black Motif */
+        .widget-layer-base {
+          background: #fff;
+          opacity: 1;
+        }
+        .widget-layer-base img {
+          mix-blend-mode: multiply;
+        }
+        /* Hover Layer: Primary Bg, White Motif */
+        .widget-layer-hover {
+          background: var(--primary);
+          opacity: 0;
+        }
+        .widget-layer-hover img {
+          filter: invert(1);
+          mix-blend-mode: lighten;
+        }
+        .widget-8g-btn:not(.is-open):hover .widget-layer-base { opacity: 0; }
+        .widget-8g-btn:not(.is-open):hover .widget-layer-hover { opacity: 1; }
+      `}} />
       <button
         onClick={() => setOpen((v) => !v)}
         title={assistantName}
-        style={{
-          position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 60,
-          width: '64px', height: '64px', borderRadius: '50%', border: 'none', cursor: 'pointer',
-          background: open ? 'var(--primary)' : '#fff',
-          color: '#fff',
-          boxShadow: '0 10px 25px -5px rgba(var(--primary-rgb, 0,0,0), 0.4), 0 8px 10px -6px rgba(var(--primary-rgb, 0,0,0), 0.2)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
-          transform: open ? 'scale(0.9)' : 'scale(1)',
-          overflow: 'hidden',
-          padding: open ? '0' : '4px' // Add a little padding so the logo doesn't bleed if it shouldn't, or keep it 0 if full bleed is desired.
-        }}
-        onMouseOver={(e) => { if(!open) e.currentTarget.style.transform = 'scale(1.05) translateY(-2px)'; }}
-        onMouseOut={(e) => { if(!open) e.currentTarget.style.transform = 'scale(1)'; }}
+        className={`widget-8g-btn ${open ? 'is-open' : ''}`}
       >
         {open ? (
-          <X size={26} strokeWidth={2.5} />
+          <X size={26} strokeWidth={2.5} color="#fff" />
         ) : (
-          <img src={Logo8G} alt="8G Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '50%' }} />
+          <>
+            <div className="widget-layer widget-layer-base">
+              <img src={Logo8G} alt="8G Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '4px' }} />
+            </div>
+            <div className="widget-layer widget-layer-hover">
+              <img src={Logo8G} alt="8G Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '4px' }} />
+            </div>
+          </>
         )}
       </button>
 
