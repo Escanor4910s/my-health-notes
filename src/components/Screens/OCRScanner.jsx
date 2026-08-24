@@ -1,11 +1,14 @@
 import React, { useState, useRef } from 'react';
 import { Camera, Upload, Loader2, X, Check } from 'lucide-react';
 import Tesseract from 'tesseract.js';
+import { askAI, parseJSONResponse } from '../../lib/ai';
+
 
 export default function OCRScanner({ onScanComplete }) {
   const [isScanning, setIsScanning] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState('');
+  const [aiStep, setAiStep] = useState(false);
   const fileInputRef = useRef(null);
 
   const handleFileUpload = async (event) => {
@@ -29,7 +32,26 @@ export default function OCRScanner({ onScanComplete }) {
       const { data: { text } } = await worker.recognize(file);
       await worker.terminate();
 
-      parseAndReturn(text);
+      // Extraction intelligente par IA, avec repli sur les heuristiques locales
+      try {
+        setAiStep(true);
+        const content = await askAI('ocr', { texte: text });
+        const parsed = parseJSONResponse(content);
+        const results = {};
+        for (const v of parsed.valeurs || []) {
+          if (v?.cle && v?.valeur !== undefined) results[v.cle] = String(v.valeur);
+        }
+        if (Object.keys(results).length) {
+          onScanComplete(results, text, parsed.synthese || '');
+        } else {
+          parseAndReturn(text);
+        }
+      } catch (aiErr) {
+        console.warn('Extraction IA indisponible, repli local', aiErr);
+        parseAndReturn(text);
+      } finally {
+        setAiStep(false);
+      }
     } catch (err) {
       setError('Erreur lors du scan du document.');
       console.error(err);
@@ -75,7 +97,7 @@ export default function OCRScanner({ onScanComplete }) {
       {isScanning ? (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
           <Loader2 className="animate-spin" size={32} color="var(--primary)" />
-          <span style={{ fontWeight: 'bold' }}>Analyse en cours... {progress}%</span>
+          <span style={{ fontWeight: 'bold' }}>{aiStep ? "Extraction intelligente par l'IA..." : `Analyse en cours... ${progress}%`}</span>
         </div>
       ) : (
         <>

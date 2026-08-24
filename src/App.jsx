@@ -18,6 +18,7 @@ import LockScreen from './components/Screens/LockScreen';
 import { NotificationProvider } from './components/UI/NotificationSystem';
 const TemplateSelector = lazy(() => import('./components/UI/TemplateSelector'));
 const VersionHistory = lazy(() => import('./components/UI/VersionHistory'));
+const AIAssistant = lazy(() => import('./components/UI/AIAssistant'));
 import SyncManager from './components/UI/SyncManager';
 import { saveVersionSnapshot, addToSyncQueue } from './lib/syncAndHistory';
 const EtatCivil = lazy(() => import('./components/Sections/EtatCivil'));
@@ -813,7 +814,12 @@ function AppContent() {
             />
           </Suspense>
         )}
+
+        <Suspense fallback={null}>
+          <AIAssistant formData={formData} />
+        </Suspense>
       </>
+
     );
 }
 

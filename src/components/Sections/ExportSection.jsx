@@ -1,5 +1,6 @@
-import React from 'react';
-import { Download, FileText } from 'lucide-react';
+import React, { useState } from 'react';
+import { Download, FileText, Sparkles, Loader2 } from 'lucide-react';
+import { askAI, compactDossier } from '../../lib/ai';
 
 // Helper: convert checkbox data to a readable string
 const listChecked = (data, mapping) => {
@@ -13,6 +14,9 @@ const listChecked = (data, mapping) => {
 const val = (obj, key) => obj?.[key] || '';
 
 function ExportSection({ data }) {
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState('');
+
 
   const generateHTMLContent = () => {
     const ec = data['etat-civil'] || {};
@@ -235,6 +239,51 @@ function ExportSection({ data }) {
     };
   };
 
+  const mdToHTML = (md) =>
+    md
+      .split('\n')
+      .map((l) => {
+        const t = l.trim();
+        if (t.startsWith('### ')) return `<h3>${t.slice(4)}</h3>`;
+        if (t.startsWith('## ')) return `<h2>${t.slice(3)}</h2>`;
+        if (t.startsWith('# ')) return `<h1>${t.slice(2)}</h1>`;
+        if (t.startsWith('- ') || t.startsWith('* ')) return `<li>${t.slice(2)}</li>`;
+        if (!t) return '';
+        return `<p>${t}</p>`;
+      })
+      .join('\n')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+
+  const exportAI = async () => {
+    if (aiLoading) return;
+    setAiLoading(true);
+    setAiError('');
+    try {
+      const md = await askAI('export', { dossier: compactDossier(data) });
+      const nom = data?.['etat-civil']?.nom_prenoms || 'Patient';
+      const html = `<html><head><meta charset="utf-8"><title>Observation Médicale - ${nom}</title>
+        <style>
+          @page { size: A4; margin: 2cm; }
+          body { font-family: 'Times New Roman', serif; font-size: 12pt; line-height: 1.6; color: #000; }
+          h1 { font-size: 17pt; text-align: center; text-transform: uppercase; border-bottom: 2px solid #000; padding-bottom: 8px; }
+          h2 { font-size: 13pt; text-transform: uppercase; border-bottom: 1px solid #999; margin-top: 22px; }
+          h3 { font-size: 12pt; }
+          li { margin-left: 18px; }
+        </style></head><body><h1>Observation Médicale</h1>${mdToHTML(md)}</body></html>`;
+      const w = window.open('', '_blank');
+      w.document.write(html);
+      w.document.close();
+      w.onload = () => {
+        w.print();
+        w.onafterprint = () => w.close();
+      };
+    } catch (e) {
+      setAiError(e.message);
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   return (
     <div className="animate-fade-in glass-panel" style={{ padding: '4rem 3rem', textAlign: 'center' }}>
       <header className="section-header" style={{ borderBottom: 'none', marginBottom: '1.5rem' }}>
@@ -255,7 +304,15 @@ function ExportSection({ data }) {
           <Download size={20} />
           Exporter en PDF
         </button>
+
+        <button onClick={exportAI} disabled={aiLoading} className="btn btn-secondary">
+          {aiLoading ? <Loader2 size={20} className="animate-spin" /> : <Sparkles size={20} />}
+          {aiLoading ? "Rédaction par l'IA..." : 'PDF rédigé par l\'IA'}
+        </button>
       </div>
+
+      {aiError && <p style={{ color: 'var(--danger)', marginTop: '1.5rem', fontSize: '0.9rem' }}>{aiError}</p>}
+
     </div>
   );
 }
