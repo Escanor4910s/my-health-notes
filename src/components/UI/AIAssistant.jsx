@@ -110,6 +110,26 @@ export default function AIAssistant({ formData }) {
         }
         .widget-8g-btn:not(.is-open):hover .widget-layer-base { opacity: 0; }
         .widget-8g-btn:not(.is-open):hover .widget-layer-hover { opacity: 1; }
+
+        /* Crossfade animations for trending dual-logo effect */
+        .logo-switcher {
+          position: absolute; inset: 0;
+          display: flex; align-items: center; justify-content: center;
+        }
+        .logo-1 { animation: crossfade1 6s ease-in-out infinite; }
+        .logo-2 { animation: crossfade2 6s ease-in-out infinite; }
+        
+        @keyframes crossfade1 {
+          0%, 42% { opacity: 1; transform: scale(1); }
+          50%, 92% { opacity: 0; transform: scale(0.85); }
+          100% { opacity: 1; transform: scale(1); }
+        }
+        @keyframes crossfade2 {
+          0%, 42% { opacity: 0; transform: scale(0.85); }
+          50%, 92% { opacity: 1; transform: scale(1); }
+          100% { opacity: 0; transform: scale(0.85); }
+        }
+        /* Slight scale animation adds to the 'ultra smooth' and 'trending' feeling */
       `}} />
       <button
         onClick={() => setOpen((v) => !v)}
@@ -120,11 +140,24 @@ export default function AIAssistant({ formData }) {
           <X size={26} strokeWidth={2.5} color="#fff" />
         ) : (
           <>
-            <div className="widget-layer widget-layer-base">
-              <img src={Logo8G} alt="8G Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '4px' }} />
+            {/* Logo 1: 8G Mandala */}
+            <div className="logo-switcher logo-1">
+              <div className="widget-layer widget-layer-base">
+                <img src={Logo8G} alt="8G Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '6px' }} />
+              </div>
+              <div className="widget-layer widget-layer-hover">
+                <img src={Logo8G} alt="8G Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '6px' }} />
+              </div>
             </div>
-            <div className="widget-layer widget-layer-hover">
-              <img src={Logo8G} alt="8G Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '4px' }} />
+
+            {/* Logo 2: ObsMed App Logo */}
+            <div className="logo-switcher logo-2">
+              <div className="widget-layer widget-layer-base">
+                <img src="/logo.png" alt="ObsMed Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '8px' }} />
+              </div>
+              <div className="widget-layer widget-layer-hover">
+                <img src="/logo.png" alt="ObsMed Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '8px' }} />
+              </div>
             </div>
           </>
         )}
