@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Download, FileText, Sparkles, Loader2 } from 'lucide-react';
+import { Download, FileText, Sparkles, Loader2, FileDown, FileEdit, FileSignature } from 'lucide-react';
 import { askAI, compactDossier } from '../../lib/ai';
 
 // Helper: convert checkbox data to a readable string
@@ -304,12 +304,12 @@ function ExportSection({ data }) {
         Votre dossier clinique est complet. Choisissez le format d'exportation qui convient le mieux à vos besoins.
       </p>
 
-      {/* Embedded CSS for responsive grid and hover effects without inline JS mess */}
+      {/* Embedded CSS for responsive grid and hover effects sans "AI Template" look */}
       <style dangerouslySetInnerHTML={{__html: `
         .export-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: 1.5rem;
+          gap: 2rem;
           justify-content: center;
         }
         @media (max-width: 768px) {
@@ -322,13 +322,13 @@ function ExportSection({ data }) {
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 1rem;
-          padding: 2rem 1.5rem;
-          border-radius: 20px;
+          gap: 1.25rem;
+          padding: 2.5rem 1.5rem;
+          border-radius: 24px;
           border: 1px solid var(--surface-border);
           background: var(--surface-bg);
           cursor: pointer;
-          transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+          transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
           box-shadow: 0 4px 15px rgba(0,0,0,0.02);
           overflow: hidden;
         }
@@ -336,16 +336,17 @@ function ExportSection({ data }) {
           content: "";
           position: absolute;
           top: 0; left: 0; right: 0;
-          height: 3px;
+          height: 4px;
           background: var(--primary);
           transform: scaleX(0);
-          transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-          transform-origin: left;
+          transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+          transform-origin: center;
         }
         .export-card-premium:hover {
           transform: translateY(-8px);
-          box-shadow: 0 20px 40px -10px rgba(0,0,0,0.12);
+          box-shadow: 0 25px 50px -12px rgba(0,0,0,0.12);
           border-color: transparent;
+          background: var(--surface);
         }
         .export-card-premium:hover::before {
           transform: scaleX(1);
@@ -354,13 +355,38 @@ function ExportSection({ data }) {
           color: var(--primary);
         }
         .export-card-premium:hover .card-icon-wrapper {
-          transform: scale(1.1);
+          transform: scale(1.05);
+        }
+        .export-card-premium:hover .card-icon-ring {
+          transform: rotate(90deg) scale(1.1);
+          opacity: 0.8;
+        }
+        /* Sophisticated Circular Icon Wrapper */
+        .card-icon-container {
+          position: relative;
+          width: 80px;
+          height: 80px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .card-icon-ring {
+          position: absolute;
+          inset: 0;
+          border-radius: 50%;
+          border: 1.5px dashed currentColor;
+          opacity: 0.15;
+          transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .card-icon-wrapper {
           width: 64px; height: 64px;
-          border-radius: 16px;
+          border-radius: 50%; /* Organic circle, not an AI square */
           display: flex; align-items: center; justify-content: center;
-          transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+          transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+          background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.4));
+          box-shadow: 0 8px 20px -5px rgba(0,0,0,0.08), inset 0 2px 4px rgba(255,255,255,0.5);
+          position: relative;
+          z-index: 2;
         }
         .card-title {
           margin: 0 0 0.5rem 0;
@@ -374,35 +400,44 @@ function ExportSection({ data }) {
       <div className="export-grid">
         {/* PDF Card */}
         <button onClick={downloadPDF} className="export-card-premium">
-          <div className="card-icon-wrapper" style={{ background: 'rgba(239, 68, 68, 0.08)', color: '#ef4444' }}>
-            <Download size={28} strokeWidth={2} />
+          <div className="card-icon-container" style={{ color: '#ef4444' }}>
+            <div className="card-icon-ring"></div>
+            <div className="card-icon-wrapper">
+              <FileDown size={28} strokeWidth={1.5} color="#ef4444" />
+            </div>
           </div>
           <div>
             <h3 className="card-title">Format PDF</h3>
-            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.4' }}>Idéal pour le partage et l'impression directe.</span>
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.4' }}>Idéal pour le partage et la consultation clinique.</span>
           </div>
         </button>
 
         {/* Word Card */}
         <button onClick={downloadWord} className="export-card-premium">
-          <div className="card-icon-wrapper" style={{ background: 'rgba(59, 130, 246, 0.08)', color: '#3b82f6' }}>
-            <FileText size={28} strokeWidth={2} />
+          <div className="card-icon-container" style={{ color: '#3b82f6' }}>
+            <div className="card-icon-ring"></div>
+            <div className="card-icon-wrapper">
+              <FileEdit size={28} strokeWidth={1.5} color="#3b82f6" />
+            </div>
           </div>
           <div>
             <h3 className="card-title">Format Word</h3>
-            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.4' }}>Idéal si vous souhaitez retoucher le document.</span>
+            <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.4' }}>Idéal si vous souhaitez ajuster vos notes médicales.</span>
           </div>
         </button>
 
-        {/* Humanized AI Export Card (Disguised) */}
+        {/* Humanized Expert Report Card (Disguised AI) */}
         <button onClick={exportAI} disabled={aiLoading} className="export-card-premium" style={{ cursor: aiLoading ? 'wait' : 'pointer', opacity: aiLoading ? 0.7 : 1 }}>
-          <div className="card-icon-wrapper" style={{ background: 'rgba(16, 185, 129, 0.08)', color: '#10b981' }}>
-            {aiLoading ? <Loader2 size={28} className="animate-spin" /> : <FileText size={28} strokeWidth={2} />}
+          <div className="card-icon-container" style={{ color: 'var(--primary)' }}>
+            <div className="card-icon-ring"></div>
+            <div className="card-icon-wrapper">
+              {aiLoading ? <Loader2 size={28} className="animate-spin" color="var(--primary)" /> : <FileSignature size={28} strokeWidth={1.5} color="var(--primary)" />}
+            </div>
           </div>
           <div>
             <h3 className="card-title">Rapport d'Expert</h3>
             <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.4' }}>
-              {aiLoading ? "Génération en cours..." : "Génération d'une synthèse clinique optimisée."}
+              {aiLoading ? "Compilation des données cliniques..." : "Synthèse clinique optimisée prête pour l'archivage."}
             </span>
           </div>
         </button>
