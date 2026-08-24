@@ -72,7 +72,7 @@ export default function AIAssistant({ formData }) {
           position: fixed; bottom: 2rem; right: 2rem; z-index: 60;
           width: 64px; height: 64px; border-radius: 50%; border: none; cursor: pointer;
           box-shadow: 0 10px 25px -5px rgba(var(--primary-rgb, 0,0,0), 0.4), 0 8px 10px -6px rgba(var(--primary-rgb, 0,0,0), 0.2);
-          transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+          transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
           padding: 0;
           background: #fff;
           display: flex; align-items: center; justify-content: center;
@@ -82,8 +82,9 @@ export default function AIAssistant({ formData }) {
           box-shadow: 0 15px 35px -5px rgba(var(--primary-rgb, 0,0,0), 0.5), 0 10px 15px -5px rgba(var(--primary-rgb, 0,0,0), 0.3);
         }
         .widget-8g-btn.is-open {
-          background: var(--primary);
-          transform: scale(0.9);
+          opacity: 0;
+          pointer-events: none;
+          transform: scale(0.5) translateY(20px);
         }
         .widget-layer {
           position: absolute; inset: 0; border-radius: 50%;
@@ -131,36 +132,47 @@ export default function AIAssistant({ formData }) {
         }
         /* Slight scale animation adds to the 'ultra smooth' and 'trending' feeling */
       `}} />
+      
+      {/* Backdrop for click-outside to close */}
+      {open && (
+        <div 
+          className="animate-fade-in"
+          onClick={() => setOpen(false)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 50,
+            background: 'rgba(0, 0, 0, 0.05)',
+            backdropFilter: 'blur(2px)'
+          }}
+        />
+      )}
+
       <button
         onClick={() => setOpen((v) => !v)}
         title={assistantName}
         className={`widget-8g-btn ${open ? 'is-open' : ''}`}
       >
-        {open ? (
-          <X size={26} strokeWidth={2.5} color="#fff" />
-        ) : (
-          <>
-            {/* Logo 1: 8G Mandala */}
-            <div className="logo-switcher logo-1">
-              <div className="widget-layer widget-layer-base">
-                <img src={Logo8G} alt="8G Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '6px' }} />
-              </div>
-              <div className="widget-layer widget-layer-hover">
-                <img src={Logo8G} alt="8G Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '6px' }} />
-              </div>
+        {/* We no longer show the X since the button vanishes */}
+        <>
+          {/* Logo 1: 8G Mandala */}
+          <div className="logo-switcher logo-1">
+            <div className="widget-layer widget-layer-base">
+              <img src={Logo8G} alt="8G Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '6px' }} />
             </div>
+            <div className="widget-layer widget-layer-hover">
+              <img src={Logo8G} alt="8G Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '6px' }} />
+            </div>
+          </div>
 
-            {/* Logo 2: ObsMed App Logo */}
-            <div className="logo-switcher logo-2">
-              <div className="widget-layer widget-layer-base">
-                <img src="/logo.png" alt="ObsMed Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '8px' }} />
-              </div>
-              <div className="widget-layer widget-layer-hover">
-                <img src="/logo.png" alt="ObsMed Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '8px' }} />
-              </div>
+          {/* Logo 2: ObsMed App Logo */}
+          <div className="logo-switcher logo-2">
+            <div className="widget-layer widget-layer-base">
+              <img src="/logo.png" alt="ObsMed Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '8px' }} />
             </div>
-          </>
-        )}
+            <div className="widget-layer widget-layer-hover">
+              <img src="/logo.png" alt="ObsMed Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '8px' }} />
+            </div>
+          </div>
+        </>
       </button>
 
       {open && (
@@ -188,10 +200,21 @@ export default function AIAssistant({ formData }) {
             <div style={{ width: '36px', height: '36px', borderRadius: '12px', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 10px rgba(0,0,0,0.08)', overflow: 'hidden', border: '1px solid var(--surface-border)' }}>
               <img src={Logo8G} alt="AI" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
             </div>
-            <div>
+            <div style={{ flex: 1 }}>
               <strong style={{ fontSize: '1.05rem', color: 'var(--text-main)', letterSpacing: '-0.3px' }}>{assistantName}</strong>
               <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '500' }}>Analyse contextuelle active</div>
             </div>
+            <button 
+              onClick={() => setOpen(false)}
+              style={{
+                background: 'transparent', border: 'none', cursor: 'pointer',
+                color: 'var(--text-muted)', padding: '0.4rem', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '10px', transition: 'all 0.2s'
+              }}
+              onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(0,0,0,0.05)'; e.currentTarget.style.color = 'var(--text-main)'; }}
+              onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--text-muted)'; }}
+            >
+              <X size={20} />
+            </button>
           </div>
 
           <div style={{ 
