@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Sparkles, X, Send, Loader2, Stethoscope, FileText, FlaskConical, Copy, Check } from 'lucide-react';
 import { askAI, compactDossier } from '../../lib/ai';
 import Markdown from './Markdown';
+import Logo8G from '../../assets/8G-logo.jpg';
 
 const QUICK_ACTIONS = [
   { action: 'synthese', label: 'Résumé syndromique', icon: FileText },
@@ -60,20 +61,27 @@ export default function AIAssistant({ formData }) {
     <>
       <button
         onClick={() => setOpen((v) => !v)}
-        title="Copilote Clinique"
+        title="Copilote Clinique (8G)"
         style={{
           position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 60,
-          width: '60px', height: '60px', borderRadius: '50%', border: 'none', cursor: 'pointer',
-          background: 'linear-gradient(135deg, var(--primary), var(--primary-dark, #000))', color: '#fff',
+          width: '64px', height: '64px', borderRadius: '50%', border: 'none', cursor: 'pointer',
+          background: open ? 'var(--primary)' : '#fff',
+          color: '#fff',
           boxShadow: '0 10px 25px -5px rgba(var(--primary-rgb, 0,0,0), 0.4), 0 8px 10px -6px rgba(var(--primary-rgb, 0,0,0), 0.2)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
           transform: open ? 'scale(0.9)' : 'scale(1)',
+          overflow: 'hidden',
+          padding: open ? '0' : '4px' // Add a little padding so the logo doesn't bleed if it shouldn't, or keep it 0 if full bleed is desired.
         }}
         onMouseOver={(e) => { if(!open) e.currentTarget.style.transform = 'scale(1.05) translateY(-2px)'; }}
         onMouseOut={(e) => { if(!open) e.currentTarget.style.transform = 'scale(1)'; }}
       >
-        {open ? <X size={26} strokeWidth={2.5} /> : <Stethoscope size={26} strokeWidth={2.5} />}
+        {open ? (
+          <X size={26} strokeWidth={2.5} />
+        ) : (
+          <img src={Logo8G} alt="8G Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '50%' }} />
+        )}
       </button>
 
       {open && (
