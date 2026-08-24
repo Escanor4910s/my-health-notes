@@ -1,5 +1,6 @@
-import React from 'react';
-import { Download, FileText } from 'lucide-react';
+import React, { useState } from 'react';
+import { Download, FileText, Sparkles, Loader2 } from 'lucide-react';
+import { askAI, compactDossier } from '../../lib/ai';
 
 // Helper: convert checkbox data to a readable string
 const listChecked = (data, mapping) => {
