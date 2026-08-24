@@ -31,7 +31,26 @@ export default function OCRScanner({ onScanComplete }) {
       const { data: { text } } = await worker.recognize(file);
       await worker.terminate();
 
-      parseAndReturn(text);
+      // Extraction intelligente par IA, avec repli sur les heuristiques locales
+      try {
+        setAiStep(true);
+        const content = await askAI('ocr', { texte: text });
+        const parsed = parseJSONResponse(content);
+        const results = {};
+        for (const v of parsed.valeurs || []) {
+          if (v?.cle && v?.valeur !== undefined) results[v.cle] = String(v.valeur);
+        }
+        if (Object.keys(results).length) {
+          onScanComplete(results, text, parsed.synthese || '');
+        } else {
+          parseAndReturn(text);
+        }
+      } catch (aiErr) {
+        console.warn('Extraction IA indisponible, repli local', aiErr);
+        parseAndReturn(text);
+      } finally {
+        setAiStep(false);
+      }
     } catch (err) {
       setError('Erreur lors du scan du document.');
       console.error(err);
