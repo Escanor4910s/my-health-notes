@@ -97,7 +97,7 @@ export default function OCRScanner({ onScanComplete }) {
       {isScanning ? (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
           <Loader2 className="animate-spin" size={32} color="var(--primary)" />
-          <span style={{ fontWeight: 'bold' }}>Analyse en cours... {progress}%</span>
+          <span style={{ fontWeight: 'bold' }}>{aiStep ? "Extraction intelligente par l'IA..." : `Analyse en cours... ${progress}%`}</span>
         </div>
       ) : (
         <>
