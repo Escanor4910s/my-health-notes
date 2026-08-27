@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { Loader2, FileDown, FileEdit, FileSignature } from 'lucide-react';
+import { Loader2, FileDown, FileEdit, FileSignature, Settings, X } from 'lucide-react';
 import { askAI, compactDossier } from '../../lib/ai';
+import { escapeHtml } from '../../lib/html';
+import { getInstitutionSettings, saveInstitutionSettings } from '../../lib/institution';
 
 // Helper: convert checkbox data to a readable string
 const listChecked = (data, mapping) => {
@@ -11,7 +13,8 @@ const listChecked = (data, mapping) => {
     .join(', ') || 'Aucun';
 };
 
-const val = (obj, key) => obj?.[key] || '';
+const val = (obj, key) => escapeHtml(obj?.[key] || '');
+
 
 function ExportSection({ data }) {
   const [aiLoading, setAiLoading] = useState(false);
