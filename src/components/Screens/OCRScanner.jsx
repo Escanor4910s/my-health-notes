@@ -20,17 +20,16 @@ export default function OCRScanner({ onScanComplete }) {
     setError('');
 
     try {
-      const worker = await Tesseract.createWorker({
+      const worker = await Tesseract.createWorker('fra+eng', 1, {
         logger: m => {
           if (m.status === 'recognizing text') {
             setProgress(Math.round(m.progress * 100));
           }
         }
       });
-      await worker.loadLanguage('fra+eng');
-      await worker.initialize('fra+eng');
       const { data: { text } } = await worker.recognize(file);
       await worker.terminate();
+
 
       // Extraction intelligente par IA, avec repli sur les heuristiques locales
       try {
