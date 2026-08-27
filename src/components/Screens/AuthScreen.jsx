@@ -9,6 +9,7 @@ export default function AuthScreen({ onLoginSuccess }) {
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [resetSent, setResetSent] = useState(false);
 
   // Form State
   const [email, setEmail] = useState('');
@@ -17,6 +18,36 @@ export default function AuthScreen({ onLoginSuccess }) {
   const [lastName, setLastName] = useState('');
   const [university, setUniversity] = useState('');
   const [level, setLevel] = useState('');
+
+  const getPasswordStrength = (pass) => {
+    let strength = 0;
+    if (pass.length >= 8) strength += 25;
+    if (/[A-Z]/.test(pass)) strength += 25;
+    if (/[0-9]/.test(pass)) strength += 25;
+    if (/[^A-Za-z0-9]/.test(pass)) strength += 25;
+    return strength;
+  };
+
+  const handleResetPassword = async () => {
+    if (!email) {
+      setError("Veuillez saisir votre adresse e-mail pour réinitialiser le mot de passe.");
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin,
+      });
+      if (error) throw error;
+      setResetSent(true);
+      notify({ type: 'success', message: 'Lien de réinitialisation envoyé par e-mail.' });
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,6 +59,9 @@ export default function AuthScreen({ onLoginSuccess }) {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
       } else {
+        if (password.length < 8) {
+          throw new Error("Le mot de passe doit contenir au moins 8 caractères.");
+        }
         const { error } = await supabase.auth.signUp({ 
           email, 
           password,
@@ -207,9 +241,24 @@ export default function AuthScreen({ onLoginSuccess }) {
                   onChange={e => setPassword(e.target.value)} 
                   placeholder="••••••••" 
                   required 
-                  minLength={6}
+                  minLength={8}
                 />
               </div>
+              {!isLogin && password && (
+                <div style={{ marginTop: '0.5rem' }}>
+                  <div style={{ height: '4px', width: '100%', background: 'var(--surface-border)', borderRadius: '2px', overflow: 'hidden' }}>
+                    <div style={{ 
+                      height: '100%', 
+                      width: `${getPasswordStrength(password)}%`, 
+                      background: getPasswordStrength(password) < 50 ? '#ef4444' : getPasswordStrength(password) < 75 ? '#f59e0b' : '#10b981',
+                      transition: 'all 0.3s'
+                    }} />
+                  </div>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                    {getPasswordStrength(password) < 50 ? 'Faible' : getPasswordStrength(password) < 75 ? 'Moyen' : 'Fort'} (8 caractères min.)
+                  </span>
+                </div>
+              )}
             </div>
             
             <button type="submit" className="btn-primary-auth dashboard-hover" disabled={loading}>
@@ -221,6 +270,19 @@ export default function AuthScreen({ onLoginSuccess }) {
               )}
             </button>
           </form>
+
+          {isLogin && (
+            <div style={{ marginTop: '1rem', textAlign: 'center' }}>
+              <button 
+                type="button" 
+                onClick={handleResetPassword} 
+                disabled={loading}
+                style={{ background: 'transparent', border: 'none', color: 'var(--primary)', cursor: 'pointer', fontSize: '0.9rem', textDecoration: 'underline' }}
+              >
+                Mot de passe oublié ? (Saisissez votre e-mail d'abord)
+              </button>
+            </div>
+          )}
 
           {isLogin && (
             <>

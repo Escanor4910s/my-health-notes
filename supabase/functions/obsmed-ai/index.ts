@@ -1,7 +1,7 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors'
 
 const GATEWAY = 'https://ai.gateway.lovable.dev/v1/chat/completions'
-const MODEL = 'google/gemini-3.7-flash'
+const MODEL = 'google/gemini-2.5-flash'
 
 const BASE_SYSTEM = `Tu es un assistant médical expert intégré à ObsMed, une application de rédaction d'observations médicales hospitalières (contexte francophone, Afrique de l'Ouest).
 Tu rédiges dans un français médical rigoureux, sobre et professionnel.
