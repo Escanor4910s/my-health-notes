@@ -126,83 +126,88 @@ export default function TemplateSelector({ onSelect, onClose }) {
     <div 
       style={{
         position: 'fixed', inset: 0, zIndex: 9999,
-        background: 'rgba(0, 0, 0, 0.4)', backdropFilter: 'blur(12px)',
+        background: 'rgba(0, 0, 0, 0.4)', backdropFilter: 'blur(8px)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        opacity: isVisible ? 1 : 0, transition: 'opacity 0.4s ease',
+        opacity: isVisible ? 1 : 0, transition: 'opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
         padding: '2rem'
       }}
       onClick={handleClose}
     >
       <div 
+        className="glass-panel"
         style={{
-          width: '100%', maxWidth: '850px',
-          background: 'var(--surface)',
-          borderRadius: '24px',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.3)',
-          border: '1px solid var(--surface-border)',
-          overflow: 'hidden',
+          width: '100%', maxWidth: '900px',
           display: 'flex', flexDirection: 'column',
-          transform: isVisible ? 'scale(1) translateY(0)' : 'scale(0.95) translateY(20px)',
-          transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
-          minHeight: '500px'
+          transform: isVisible ? 'scale(1) translateY(0)' : 'scale(0.97) translateY(20px)',
+          transition: 'all 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+          minHeight: '500px',
+          padding: 0 // overriding glass-panel default padding to handle it manually
         }}
         onClick={e => e.stopPropagation()}
       >
-        {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.5rem 2rem', borderBottom: '1px solid var(--surface-border)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            {mode !== 'selection' && (
-              <button 
-                onClick={() => setMode('selection')}
-                style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-main)', padding: '0.5rem', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                className="hover-bg-subtle"
-              >
-                <ChevronLeft size={24} />
-              </button>
-            )}
-            <div>
-              <h2 style={{ fontSize: '1.4rem', fontWeight: '700', color: 'var(--text-main)', margin: 0 }}>
-                {mode === 'selection' ? 'Nouveau Dossier Médical' : 'Importation IA (8G)'}
-              </h2>
-              <p style={{ margin: '0.25rem 0 0 0', color: 'var(--text-light)', fontSize: '0.9rem' }}>
-                {mode === 'selection' ? 'Comment souhaitez-vous démarrer votre observation ?' : 'Glissez une ordonnance, des notes manuscrites ou des résultats biologiques.'}
-              </p>
-            </div>
-          </div>
-          <button onClick={handleClose} style={{ background: 'var(--surface-bg)', border: 'none', cursor: 'pointer', color: 'var(--text-light)', padding: '0.6rem', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}>
+        {/* Header Centralisé */}
+        <div style={{ position: 'relative', padding: '3rem 2rem 1rem 2rem', textAlign: 'center' }}>
+          {mode !== 'selection' && (
+            <button 
+              onClick={() => setMode('selection')}
+              className="premium-back-btn"
+              style={{ position: 'absolute', left: '2rem', top: '3rem', background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-main)', padding: '0.5rem', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+            >
+              <ChevronLeft size={24} />
+            </button>
+          )}
+          
+          <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', fontWeight: '600', color: 'var(--text-main)', margin: '0 0 0.5rem 0', letterSpacing: '-0.5px' }}>
+            {mode === 'selection' ? 'Nouveau Dossier Médical' : 'Importation IA (8G)'}
+          </h2>
+          <p style={{ margin: 0, color: 'var(--text-light)', fontSize: '1.05rem', fontWeight: '400' }}>
+            {mode === 'selection' ? 'Comment souhaitez-vous démarrer votre observation ?' : 'Glissez une ordonnance, des notes manuscrites ou des résultats biologiques.'}
+          </p>
+
+          <button 
+            onClick={handleClose} 
+            className="premium-close-btn"
+            style={{ 
+              position: 'absolute', right: '2rem', top: '3rem',
+              background: 'var(--surface-bg)', border: 'none', cursor: 'pointer', 
+              color: 'var(--text-light)', padding: '0.6rem', borderRadius: '50%', 
+              display: 'flex', alignItems: 'center', justifyContent: 'center', 
+              transition: 'all 0.3s ease' 
+            }}
+          >
             <X size={20} />
           </button>
         </div>
 
         {/* Content Area */}
-        <div style={{ padding: '2.5rem', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        <div style={{ padding: '2rem 3rem 4rem 3rem', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           
           {mode === 'selection' && (
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', height: '100%' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2.5rem', height: '100%', alignItems: 'stretch' }}>
               
               {/* Option 1: From Scratch */}
               <div 
                 onClick={() => {
                   setIsVisible(false);
-                  setTimeout(() => onSelect({ defaultData: {} }), 300);
+                  setTimeout(() => onSelect({ defaultData: {} }), 400);
                 }}
-                className="hover-card"
+                className="premium-choice-card"
                 style={{
                   background: 'var(--surface-bg)',
-                  borderRadius: '20px',
+                  borderRadius: '16px',
                   padding: '3rem 2rem',
-                  border: '2px solid transparent',
+                  border: '1.5px solid transparent', // Default no border line
                   cursor: 'pointer',
                   display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                   textAlign: 'center',
-                  transition: 'all 0.3s ease'
+                  transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
                 }}
               >
-                <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'var(--surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '2rem', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.05)' }}>
-                  <FileText size={36} color="var(--text-main)" />
+                <div className="icon-container" style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'transparent', border: '1px solid var(--surface-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '2rem', transition: 'all 0.4s ease' }}>
+                  <FileText size={28} color="var(--text-main)" className="icon-svg" style={{ transition: 'all 0.4s ease' }} />
                 </div>
-                <h3 style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--text-main)', marginBottom: '1rem' }}>Construire à partir de zéro</h3>
-                <p style={{ color: 'var(--text-light)', fontSize: '1rem', lineHeight: 1.5 }}>
+                <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', fontWeight: '600', color: 'var(--text-main)', marginBottom: '1rem' }}>Construire à partir de zéro</h3>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.6, maxWidth: '250px' }}>
                   Ouvrez un dossier vierge et saisissez manuellement vos observations de A à Z.
                 </p>
               </div>
@@ -210,36 +215,31 @@ export default function TemplateSelector({ onSelect, onClose }) {
               {/* Option 2: AI */}
               <div 
                 onClick={() => setMode('upload')}
-                className="hover-card-ai"
+                className="premium-choice-card"
                 style={{
-                  background: 'linear-gradient(145deg, rgba(139,111,71,0.05) 0%, rgba(139,111,71,0.15) 100%)',
-                  borderRadius: '20px',
+                  background: 'var(--surface-bg)',
+                  borderRadius: '16px',
                   padding: '3rem 2rem',
-                  border: '2px solid rgba(139,111,71,0.3)',
+                  border: '1.5px solid transparent', // Default no border line
                   cursor: 'pointer',
                   display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                   textAlign: 'center',
-                  transition: 'all 0.3s ease',
-                  position: 'relative',
-                  overflow: 'hidden'
+                  transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
                 }}
               >
-                <div style={{ position: 'absolute', top: '-20px', right: '-20px', opacity: 0.1 }}>
-                  <Sparkles size={150} color="var(--primary)" />
+                <div className="icon-container" style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'transparent', border: '1px solid var(--surface-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '2rem', transition: 'all 0.4s ease' }}>
+                  <Sparkles size={28} color="var(--primary)" className="icon-svg" style={{ transition: 'all 0.4s ease' }} />
                 </div>
-                <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '2rem', boxShadow: '0 15px 35px -10px rgba(139,111,71,0.6)' }}>
-                  <Sparkles size={36} color="#fff" />
-                </div>
-                <h3 style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--primary)', marginBottom: '1rem' }}>Construire avec 8G</h3>
-                <p style={{ color: 'var(--text-main)', fontSize: '1rem', lineHeight: 1.5, opacity: 0.8 }}>
-                  L'IA analyse vos photos, notes ou documents pour pré-remplir instantanément le dossier.
+                <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', fontWeight: '600', color: 'var(--primary)', marginBottom: '1rem' }}>Construire avec 8G</h3>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.6, maxWidth: '260px' }}>
+                  L'IA analyse vos photos ou notes pour pré-remplir organiquement le dossier.
                 </p>
               </div>
             </div>
           )}
 
           {mode === 'upload' && (
-            <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <div className="animate-fade-in" style={{ height: '100%', display: 'flex', flexDirection: 'column', animationDuration: '0.6s' }}>
               <div 
                 onDragEnter={handleDrag}
                 onDragLeave={handleDrag}
@@ -247,11 +247,11 @@ export default function TemplateSelector({ onSelect, onClose }) {
                 onDrop={handleDrop}
                 style={{
                   flex: 1,
-                  border: `3px dashed ${dragActive ? 'var(--primary)' : 'var(--surface-border)'}`,
-                  borderRadius: '20px',
-                  background: dragActive ? 'rgba(139,111,71,0.05)' : 'var(--surface-bg)',
+                  border: `1.5px dashed ${dragActive ? 'var(--primary)' : 'var(--surface-border)'}`,
+                  borderRadius: '16px',
+                  background: dragActive ? 'rgba(var(--primary-rgb, 139,111,71), 0.03)' : 'var(--surface-bg)',
                   display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                  transition: 'all 0.2s',
+                  transition: 'all 0.3s ease',
                   position: 'relative'
                 }}
               >
@@ -263,22 +263,22 @@ export default function TemplateSelector({ onSelect, onClose }) {
                   style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }}
                 />
                 
-                <UploadCloud size={64} color={dragActive ? 'var(--primary)' : 'var(--text-muted)'} style={{ marginBottom: '1.5rem', transition: 'color 0.2s' }} />
-                <h4 style={{ fontSize: '1.3rem', color: 'var(--text-main)', margin: '0 0 0.5rem 0' }}>Glissez-déposez votre document ici</h4>
-                <p style={{ color: 'var(--text-light)', margin: 0 }}>Images (JPG, PNG) ou PDF supportés.</p>
+                <UploadCloud size={48} color={dragActive ? 'var(--primary)' : 'var(--text-muted)'} style={{ marginBottom: '1.5rem', transition: 'color 0.3s', opacity: 0.8 }} />
+                <h4 style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', color: 'var(--text-main)', margin: '0 0 0.5rem 0', fontWeight: '500' }}>Glissez-déposez votre document ici</h4>
+                <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.95rem' }}>Images (JPG, PNG) ou PDF supportés.</p>
                 
-                <div style={{ marginTop: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                  <span style={{ height: '1px', width: '40px', background: 'var(--surface-border)' }} />
-                  <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>OU</span>
-                  <span style={{ height: '1px', width: '40px', background: 'var(--surface-border)' }} />
+                <div style={{ marginTop: '2.5rem', display: 'flex', alignItems: 'center', gap: '1rem', opacity: 0.6 }}>
+                  <span style={{ height: '1px', width: '30px', background: 'var(--text-muted)' }} />
+                  <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', letterSpacing: '1px' }}>OU</span>
+                  <span style={{ height: '1px', width: '30px', background: 'var(--text-muted)' }} />
                 </div>
                 
-                <button style={{ marginTop: '2rem', background: 'var(--primary)', color: '#fff', border: 'none', padding: '0.8rem 2rem', borderRadius: '99px', fontSize: '1rem', fontWeight: '600', pointerEvents: 'none' }}>
+                <button style={{ marginTop: '2.5rem', background: 'transparent', color: 'var(--primary)', border: '1px solid var(--primary)', padding: '0.7rem 2rem', borderRadius: '99px', fontSize: '0.95rem', fontWeight: '500', pointerEvents: 'none', transition: 'all 0.3s ease' }}>
                   Parcourir les fichiers
                 </button>
               </div>
               {error && (
-                <div style={{ marginTop: '1rem', padding: '1rem', background: '#fee2e2', color: '#ef4444', borderRadius: '12px', textAlign: 'center', fontSize: '0.9rem' }}>
+                <div className="animate-fade-in" style={{ marginTop: '1.5rem', padding: '1rem', background: '#fee2e2', color: '#ef4444', borderRadius: '8px', textAlign: 'center', fontSize: '0.9rem', border: '1px solid #fecaca' }}>
                   {error}
                 </div>
               )}
@@ -286,37 +286,61 @@ export default function TemplateSelector({ onSelect, onClose }) {
           )}
 
           {mode === 'processing' && (
-            <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-              <div style={{ position: 'relative', width: '120px', height: '120px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '3rem' }}>
-                <div className="absolute inset-0" style={{ border: '4px solid rgba(139,111,71,0.2)', borderRadius: '50%' }}></div>
-                <div className="absolute inset-0 animate-spin" style={{ border: '4px solid transparent', borderTopColor: 'var(--primary)', borderRadius: '50%' }}></div>
+            <div className="animate-fade-in" style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', animationDuration: '0.8s' }}>
+              <div style={{ position: 'relative', width: '100px', height: '100px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '2.5rem' }}>
+                <div className="absolute inset-0" style={{ border: '1.5px solid var(--surface-border)', borderRadius: '50%' }}></div>
+                <div className="absolute inset-0 animate-spin" style={{ border: '1.5px solid transparent', borderTopColor: 'var(--primary)', borderRadius: '50%', animationDuration: '1.5s' }}></div>
                 {previewUrl ? (
-                  <img src={previewUrl} alt="Preview" style={{ width: '90px', height: '90px', borderRadius: '50%', objectFit: 'cover', opacity: 0.8 }} />
+                  <img src={previewUrl} alt="Preview" style={{ width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', opacity: 0.9 }} />
                 ) : (
-                  <File size={48} color="var(--primary)" />
+                  <File size={32} color="var(--primary)" opacity={0.8} />
                 )}
                 
-                {/* AI Scanning Beam */}
-                <div style={{ position: 'absolute', top: '-10%', left: 0, right: 0, height: '4px', background: 'var(--primary)', boxShadow: '0 0 15px 5px rgba(139,111,71,0.5)', animation: 'scan 2s infinite ease-in-out', borderRadius: '10px' }} />
+                {/* Scanner Beam subtil */}
+                <div style={{ position: 'absolute', top: '-10%', left: 0, right: 0, height: '2px', background: 'var(--primary)', boxShadow: '0 0 10px 2px rgba(var(--primary-rgb, 139,111,71), 0.3)', animation: 'scanPremium 2.5s infinite cubic-bezier(0.4, 0, 0.2, 1)', borderRadius: '10px' }} />
               </div>
               
-              <h3 style={{ fontSize: '1.5rem', color: 'var(--text-main)', margin: '0 0 1rem 0', fontWeight: '600' }}>{progressText}</h3>
-              <p style={{ color: 'var(--text-light)', maxWidth: '400px', textAlign: 'center' }}>
-                8G analyse votre document pour extraire intelligemment les informations cliniques et les placer dans les bonnes sections.
+              <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', color: 'var(--text-main)', margin: '0 0 0.75rem 0', fontWeight: '500' }}>{progressText}</h3>
+              <p style={{ color: 'var(--text-muted)', maxWidth: '350px', textAlign: 'center', fontSize: '0.95rem', lineHeight: 1.5 }}>
+                Veuillez patienter pendant que l'intelligence artificielle structure vos informations cliniques.
               </p>
             </div>
           )}
         </div>
         
         <style dangerouslySetInnerHTML={{__html: `
-          .hover-card:hover { border-color: var(--surface-border) !important; background: var(--surface) !important; box-shadow: 0 15px 30px -10px rgba(0,0,0,0.1); transform: translateY(-5px); }
-          .hover-card-ai:hover { border-color: var(--primary) !important; box-shadow: 0 15px 35px -10px rgba(139,111,71,0.4); transform: translateY(-5px); }
-          .hover-bg-subtle:hover { background: rgba(0,0,0,0.05) !important; }
-          [data-theme="dark"] .hover-bg-subtle:hover { background: rgba(255,255,255,0.1) !important; }
-          @keyframes scan {
+          .premium-close-btn:hover {
+            background: #fee2e2 !important;
+            color: #ef4444 !important;
+            transform: scale(1.05) rotate(90deg);
+          }
+          .premium-back-btn:hover {
+            background: var(--surface-bg) !important;
+            transform: translateX(-3px);
+          }
+          
+          /* L'animation et l'effet demandé par l'utilisateur : trait fin + léger ombrage au hover */
+          .premium-choice-card:hover { 
+            border-color: var(--primary) !important; 
+            background: var(--surface) !important; 
+            box-shadow: var(--shadow-md) !important; 
+            transform: translateY(-4px); 
+          }
+          
+          /* Effets sur l'icône lors du survol de la carte */
+          .premium-choice-card:hover .icon-container {
+            background: var(--primary) !important;
+            border-color: var(--primary) !important;
+            transform: scale(1.1);
+          }
+          .premium-choice-card:hover .icon-svg {
+            color: #fff !important;
+          }
+          
+          @keyframes scanPremium {
             0% { top: -10%; opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
+            15% { opacity: 1; }
+            85% { opacity: 1; }
             100% { top: 110%; opacity: 0; }
           }
         `}} />
