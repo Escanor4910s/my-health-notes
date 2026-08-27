@@ -19,6 +19,9 @@ const val = (obj, key) => escapeHtml(obj?.[key] || '');
 function ExportSection({ data }) {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState('');
+  const [showInstitution, setShowInstitution] = useState(false);
+  const [institution, setInstitution] = useState(getInstitutionSettings());
+
 
 
   const generateHTMLContent = () => {
