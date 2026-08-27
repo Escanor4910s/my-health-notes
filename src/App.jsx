@@ -21,6 +21,7 @@ const VersionHistory = lazy(() => import('./components/UI/VersionHistory'));
 const AIAssistant = lazy(() => import('./components/UI/AIAssistant'));
 const AIEducationCard = lazy(() => import('./components/UI/AIEducationCard'));
 import SyncManager from './components/UI/SyncManager';
+import CommandPalette from './components/UI/CommandPalette';
 import { saveVersionSnapshot, addToSyncQueue } from './lib/syncAndHistory';
 const EtatCivil = lazy(() => import('./components/Sections/EtatCivil'));
 const MotifConsultation = lazy(() => import('./components/Sections/MotifConsultation'));
@@ -309,9 +310,16 @@ const MobileDashboardButton = ({ onGoDashboard }) => {
 
 function AppContent() {
   const [session, setSession] = useState(null);
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [appMode, setAppMode] = useState(() => {
     return localStorage.getItem('obsmed-pin') ? 'locked' : 'dashboard';
   });
+
+  useEffect(() => {
+    const openCmd = () => setIsCommandPaletteOpen(true);
+    window.addEventListener('open-command-palette', openCmd);
+    return () => window.removeEventListener('open-command-palette', openCmd);
+  }, []);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -508,12 +516,26 @@ function AppContent() {
   }, [formData]);
 
   const navigateTo = useCallback((sectionId) => {
-    setActiveSection(sectionId);
-    setPageKey(k => k + 1);
-    if (EXAMEN_SUBSECTIONS.some(s => s.id === sectionId)) setIsExamenOpen(true);
-    if (window.innerWidth <= 1024) setIsMobileMenuOpen(false);
-    window.scrollTo(0, 0);
+    const doNavigate = () => {
+      setActiveSection(sectionId);
+      setPageKey(k => k + 1);
+      if (EXAMEN_SUBSECTIONS.some(s => s.id === sectionId)) setIsExamenOpen(true);
+      if (window.innerWidth <= 1024) setIsMobileMenuOpen(false);
+      window.scrollTo(0, 0);
+    };
+
+    if (document.startViewTransition) {
+      document.startViewTransition(doNavigate);
+    } else {
+      doNavigate();
+    }
   }, []);
+
+  const shouldPulseAI = useMemo(() => {
+    if (!formData?.motif) return false;
+    const text = (typeof formData.motif === 'string' ? formData.motif : JSON.stringify(formData.motif)).toLowerCase();
+    return text.includes('fièvre') || text.includes('douleur') || text.includes('urgence');
+  }, [formData?.motif]);
 
   const activeSectionsListGlobal = ALL_SECTIONS_FLAT.filter(s => {
     if (s.id === 'examen-gyneco' && formData['etat-civil']?.sexe === 'M') return false;
@@ -632,6 +654,12 @@ function AppContent() {
 
   return (
     <>
+      <CommandPalette 
+        isOpen={isCommandPaletteOpen} 
+        onClose={() => setIsCommandPaletteOpen(false)} 
+        navigateTo={navigateTo} 
+      />
+      
       <MobileDashboardButton onGoDashboard={() => setIsMobileMenuOpen(true)} />
       
       {showSplash && (
@@ -827,7 +855,7 @@ function AppContent() {
         )}
 
         <Suspense fallback={null}>
-          <AIAssistant formData={formData} />
+          <AIAssistant formData={formData} shouldPulse={shouldPulseAI} />
         </Suspense>
       </>
 

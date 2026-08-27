@@ -10,7 +10,7 @@ const QUICK_ACTIONS = [
   { action: 'interpretation', label: 'Interpréter le bilan', icon: FlaskConical },
 ];
 
-export default function AIAssistant({ formData }) {
+export default function AIAssistant({ formData, shouldPulse }) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -130,6 +130,16 @@ export default function AIAssistant({ formData }) {
           50%, 92% { opacity: 1; transform: scale(1); }
           100% { opacity: 0; transform: scale(0.85); }
         }
+        
+        .ai-proactive-pulse {
+          animation: aiProactivePulse 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+          box-shadow: 0 0 0 0 rgba(var(--primary-rgb, 139,111,71), 0.7);
+        }
+        @keyframes aiProactivePulse {
+          0% { box-shadow: 0 0 0 0 rgba(var(--primary-rgb, 139,111,71), 0.7); }
+          70% { box-shadow: 0 0 0 20px rgba(var(--primary-rgb, 139,111,71), 0); }
+          100% { box-shadow: 0 0 0 0 rgba(var(--primary-rgb, 139,111,71), 0); }
+        }
         /* Slight scale animation adds to the 'ultra smooth' and 'trending' feeling */
       `}} />
       
@@ -149,7 +159,7 @@ export default function AIAssistant({ formData }) {
       <button
         onClick={() => setOpen((v) => !v)}
         title={assistantName}
-        className={`widget-8g-btn ${open ? 'is-open' : ''}`}
+        className={`widget-8g-btn ${open ? 'is-open' : ''} ${shouldPulse && !open ? 'ai-proactive-pulse' : ''}`}
       >
         {/* We no longer show the X since the button vanishes */}
         <>
