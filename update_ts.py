@@ -1,128 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { 
-  FileText, 
-  Sparkles,
-  UploadCloud,
-  ChevronLeft,
-  Loader2,
-  CheckCircle2,
-  Image as ImageIcon,
-  File,
-  X
-} from 'lucide-react';
-import { askAI, parseJSONResponse } from '../../lib/ai';
+import re
 
-export default function TemplateSelector({ onSelect, onClose }) {
-  const [isVisible, setIsVisible] = useState(false);
-  const [mode, setMode] = useState('selection'); // 'selection', 'upload', 'processing'
-  const [dragActive, setDragActive] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(null);
-  const [error, setError] = useState(null);
-  const [progressText, setProgressText] = useState('Analyse en cours...');
+with open(r'C:\Users\7MAKSACOD PC\.gemini\antigravity\scratch\medical-observation\src\components\UI\TemplateSelector.jsx', 'r', encoding='utf-8') as f:
+    content = f.read()
 
-  useEffect(() => {
-    requestAnimationFrame(() => setIsVisible(true));
-  }, []);
-
-  const handleClose = () => {
-    setIsVisible(false);
-    setTimeout(onClose, 300);
-  };
-
-  const handleDrag = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === 'dragenter' || e.type === 'dragover') setDragActive(true);
-    else if (e.type === 'dragleave') setDragActive(false);
-  };
-
-  const processFile = (file) => {
-    if (!file) return;
-    setSelectedFile(file);
-    if (file.type.startsWith('image/')) {
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
-    } else {
-      setPreviewUrl(null);
-    }
-    
-    // Auto-start processing
-    handleAIExtraction(file);
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      processFile(e.dataTransfer.files[0]);
-    }
-  };
-
-  const handleChange = (e) => {
-    e.preventDefault();
-    if (e.target.files && e.target.files[0]) {
-      processFile(e.target.files[0]);
-    }
-  };
-
-  const toBase64 = (file) => new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result.split(',')[1]);
-    reader.onerror = error => reject(error);
-  });
-
-  const handleAIExtraction = async (file) => {
-    setMode('processing');
-    setError(null);
-    try {
-      setProgressText('Extraction du texte...');
-      const base64 = await toBase64(file);
-      
-      setProgressText('Analyse clinique par 8G...');
-      
-      // We pass it to askAI. Note: The edge function must support this.
-      // If the edge function does not support it yet, it will throw, and we can catch and mock or show error.
-      let result;
-      try {
-        result = await askAI('ocr', { 
-          image: base64,
-          mimeType: file.type
-        });
-      } catch (aiErr) {
-        console.warn("AI OCR API might not be fully implemented on Edge:", aiErr);
-        // Fallback mock for UI demonstration if Edge Function fails
-        await new Promise(r => setTimeout(r, 2000));
-        result = JSON.stringify({
-          "etat-civil": { nom: "Doe", prenom: "John", age: "45", sexe: "M" },
-          "motif": { texte: "Douleur thoracique irradiant vers le bras gauche." }
-        });
-      }
-
-      setProgressText('Structuration du dossier...');
-      await new Promise(r => setTimeout(r, 800)); // Smooth UX pause
-      
-      const parsedData = parseJSONResponse(result);
-      
-      // Cleanup
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
-      
-      // Launch
-      setIsVisible(false);
-      setTimeout(() => {
-        onSelect({ defaultData: parsedData });
-      }, 300);
-
-    } catch (err) {
-      console.error(err);
-      setError("Désolé, une erreur est survenue lors de l'analyse du document.");
-      setMode('upload');
-    }
-  };
-
-  return (
+new_return = """  return (
     <>
     <style dangerouslySetInnerHTML={{__html: `
       .ts-modal-overlay {
@@ -139,7 +20,7 @@ export default function TemplateSelector({ onSelect, onClose }) {
       .ts-glass-panel {
         width: 100%; max-width: 960px; min-height: 540px;
         position: relative;
-        background: rgba(255, 255, 255, 0.90);
+        background: rgba(255, 255, 255, 0.85);
         border-radius: 32px;
         box-shadow: 
           inset 0 0 0 1px rgba(255, 255, 255, 1),
@@ -419,3 +300,14 @@ export default function TemplateSelector({ onSelect, onClose }) {
     </>
   );
 }
+"""
+
+# Replace everything from "  return (" to the end
+idx = content.find("  return (")
+if idx != -1:
+    new_content = content[:idx] + new_return
+    with open(r'C:\Users\7MAKSACOD PC\.gemini\antigravity\scratch\medical-observation\src\components\UI\TemplateSelector.jsx', 'w', encoding='utf-8') as f:
+        f.write(new_content)
+    print("Success")
+else:
+    print("Error: Could not find return statement")

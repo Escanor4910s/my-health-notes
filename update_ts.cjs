@@ -1,137 +1,18 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { 
-  FileText, 
-  Sparkles,
-  UploadCloud,
-  ChevronLeft,
-  Loader2,
-  CheckCircle2,
-  Image as ImageIcon,
-  File,
-  X
-} from 'lucide-react';
-import { askAI, parseJSONResponse } from '../../lib/ai';
+const fs = require('fs');
 
-export default function TemplateSelector({ onSelect, onClose }) {
-  const [isVisible, setIsVisible] = useState(false);
-  const [mode, setMode] = useState('selection'); // 'selection', 'upload', 'processing'
-  const [dragActive, setDragActive] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState(null);
-  const [error, setError] = useState(null);
-  const [progressText, setProgressText] = useState('Analyse en cours...');
+const path = 'C:\\Users\\7MAKSACOD PC\\.gemini\\antigravity\\scratch\\medical-observation\\src\\components\\UI\\TemplateSelector.jsx';
+const content = fs.readFileSync(path, 'utf8');
 
-  useEffect(() => {
-    requestAnimationFrame(() => setIsVisible(true));
-  }, []);
-
-  const handleClose = () => {
-    setIsVisible(false);
-    setTimeout(onClose, 300);
-  };
-
-  const handleDrag = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === 'dragenter' || e.type === 'dragover') setDragActive(true);
-    else if (e.type === 'dragleave') setDragActive(false);
-  };
-
-  const processFile = (file) => {
-    if (!file) return;
-    setSelectedFile(file);
-    if (file.type.startsWith('image/')) {
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
-    } else {
-      setPreviewUrl(null);
-    }
-    
-    // Auto-start processing
-    handleAIExtraction(file);
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      processFile(e.dataTransfer.files[0]);
-    }
-  };
-
-  const handleChange = (e) => {
-    e.preventDefault();
-    if (e.target.files && e.target.files[0]) {
-      processFile(e.target.files[0]);
-    }
-  };
-
-  const toBase64 = (file) => new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result.split(',')[1]);
-    reader.onerror = error => reject(error);
-  });
-
-  const handleAIExtraction = async (file) => {
-    setMode('processing');
-    setError(null);
-    try {
-      setProgressText('Extraction du texte...');
-      const base64 = await toBase64(file);
-      
-      setProgressText('Analyse clinique par 8G...');
-      
-      // We pass it to askAI. Note: The edge function must support this.
-      // If the edge function does not support it yet, it will throw, and we can catch and mock or show error.
-      let result;
-      try {
-        result = await askAI('ocr', { 
-          image: base64,
-          mimeType: file.type
-        });
-      } catch (aiErr) {
-        console.warn("AI OCR API might not be fully implemented on Edge:", aiErr);
-        // Fallback mock for UI demonstration if Edge Function fails
-        await new Promise(r => setTimeout(r, 2000));
-        result = JSON.stringify({
-          "etat-civil": { nom: "Doe", prenom: "John", age: "45", sexe: "M" },
-          "motif": { texte: "Douleur thoracique irradiant vers le bras gauche." }
-        });
-      }
-
-      setProgressText('Structuration du dossier...');
-      await new Promise(r => setTimeout(r, 800)); // Smooth UX pause
-      
-      const parsedData = parseJSONResponse(result);
-      
-      // Cleanup
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
-      
-      // Launch
-      setIsVisible(false);
-      setTimeout(() => {
-        onSelect({ defaultData: parsedData });
-      }, 300);
-
-    } catch (err) {
-      console.error(err);
-      setError("Désolé, une erreur est survenue lors de l'analyse du document.");
-      setMode('upload');
-    }
-  };
-
-  return (
+const newReturn = `  return (
     <>
-    <style dangerouslySetInnerHTML={{__html: `
+    <style dangerouslySetInnerHTML={{__html: \`
       .ts-modal-overlay {
         position: fixed; inset: 0; z-index: 9999;
         background: rgba(255, 255, 255, 0.2);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         display: flex; align-items: center; justify-content: center;
-        opacity: ${isVisible ? 1 : 0};
+        opacity: \${isVisible ? 1 : 0};
         transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         padding: 2rem;
       }
@@ -145,7 +26,7 @@ export default function TemplateSelector({ onSelect, onClose }) {
           inset 0 0 0 1px rgba(255, 255, 255, 1),
           0 40px 80px -20px rgba(0, 0, 0, 0.15),
           0 20px 40px -10px rgba(0, 0, 0, 0.1);
-        transform: ${isVisible ? 'scale(1) translateY(0)' : 'scale(0.96) translateY(30px)'};
+        transform: \${isVisible ? 'scale(1) translateY(0)' : 'scale(0.96) translateY(30px)'};
         transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
         overflow: hidden;
         display: flex; flex-direction: column;
@@ -279,7 +160,7 @@ export default function TemplateSelector({ onSelect, onClose }) {
         font-size: 1.05rem; color: #64748b; line-height: 1.6;
         margin: 0; max-width: 280px; position: relative; z-index: 2;
       }
-    `}} />
+    \`} />
 
     <div className="ts-modal-overlay" onClick={handleClose}>
       <div className="ts-glass-panel" onClick={e => e.stopPropagation()}>
@@ -370,7 +251,7 @@ export default function TemplateSelector({ onSelect, onClose }) {
               onDrop={handleDrop}
               style={{
                 flex: 1,
-                border: `2px dashed ${dragActive ? 'var(--primary)' : '#cbd5e1'}`,
+                border: \`2px dashed \${dragActive ? 'var(--primary)' : '#cbd5e1'}\`,
                 borderRadius: '24px',
                 background: dragActive ? 'rgba(var(--primary-rgb, 139,111,71), 0.04)' : '#f8fafc',
                 display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
@@ -418,4 +299,14 @@ export default function TemplateSelector({ onSelect, onClose }) {
     </div>
     </>
   );
+}
+`;
+
+const match = content.indexOf('  return (');
+if (match !== -1) {
+  const updatedContent = content.substring(0, match) + newReturn;
+  fs.writeFileSync(path, updatedContent);
+  console.log("Success");
+} else {
+  console.log("Error finding return");
 }
