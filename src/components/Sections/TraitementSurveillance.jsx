@@ -17,7 +17,7 @@ const DynamicMedList = ({ title, meds, setMeds, detailsId, detailsValue, details
   };
 
   return (
-    <div style={{ marginBottom: '2rem', padding: '1.5rem', backgroundColor: 'var(--surface-color)', borderRadius: '12px', border: '1px solid var(--surface-border)' }}>
+    <div style={{ marginBottom: '2rem', padding: '1.5rem', backgroundColor: 'var(--surface-bg)', borderRadius: '12px', border: '1px solid var(--surface-border)' }}>
       <h6 style={{ marginBottom: '1rem', color: 'var(--primary)', fontSize: '1rem' }}>{title}</h6>
       
       {meds.map((med, index) => (
@@ -31,19 +31,19 @@ const DynamicMedList = ({ title, meds, setMeds, detailsId, detailsValue, details
             <input type="text" className="input-field" placeholder="Ex: 1g" value={med.dose || ''} onChange={(e) => updateMedicament(med.id, 'dose', e.target.value)} />
           </div>
           <div className="input-group" style={{ marginBottom: 0 }}>
-            <label className="input-label" style={{ fontSize: '0.8rem' }}>Posologie</label>
+            <label className="input-label" style={{ fontSize: '0.85rem' }}>Posologie</label>
             <input type="text" className="input-field" placeholder="Ex: 3x/jour" value={med.posologie || ''} onChange={(e) => updateMedicament(med.id, 'posologie', e.target.value)} />
           </div>
           {index > 0 ? (
-            <button type="button" onClick={() => removeMedicament(med.id)} style={{ padding: '0.7rem', backgroundColor: '#fee2e2', color: '#ef4444', border: 'none', borderRadius: '4px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '40px' }} title="Supprimer">
+            <button type="button" onClick={() => removeMedicament(med.id)} style={{ padding: '0.6rem', backgroundColor: 'transparent', color: 'var(--text-light)', border: '1px solid var(--surface-border)', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '40px', transition: 'all 0.2s ease' }} onMouseEnter={(e) => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.borderColor = '#ef4444'; e.currentTarget.style.background = '#fff0f0'; }} onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-light)'; e.currentTarget.style.borderColor = 'var(--surface-border)'; e.currentTarget.style.background = 'transparent'; }} title="Supprimer">
               <Trash2 size={18} />
             </button>
           ) : (
-            <div style={{ width: '40px' }}></div>
+            <div style={{ width: '40px' }} />
           )}
         </div>
       ))}
-      <button type="button" onClick={addMedicament} style={{ width: '100%', padding: '0.75rem', marginTop: '0.5rem', marginBottom: '1.5rem', backgroundColor: 'transparent', border: '2px dashed var(--primary)', color: 'var(--primary)', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', fontWeight: '500' }}>
+      <button type="button" onClick={addMedicament} style={{ width: '100%', padding: '0.75rem', marginTop: '0.5rem', marginBottom: '1.5rem', backgroundColor: 'transparent', border: '1.5px dashed var(--surface-border)', color: 'var(--primary)', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', fontWeight: '500', transition: 'all 0.2s ease' }} onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.background = 'rgba(139,111,71,0.05)'; }} onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--surface-border)'; e.currentTarget.style.background = 'transparent'; }}>
         <Plus size={18} />
         Ajouter un médicament
       </button>

@@ -98,8 +98,10 @@ function DiagnosticRetenu({ data, updateData }) {
         </p>
 
         {diffDiagnostics.map((diag, index) => (
-          <div key={diag.id} style={{ display: 'grid', gridTemplateColumns: 'auto 1fr 1fr auto', gap: '1rem', alignItems: 'start', marginBottom: '1rem', padding: '1rem', background: 'var(--surface-color)', borderRadius: '8px', border: '1px solid var(--surface-border)' }}>
-            <div style={{ marginTop: '2rem', fontSize: '1.2rem', color: 'var(--primary)', fontWeight: 'bold' }}>❖</div>
+          <div key={diag.id} style={{ display: 'grid', gridTemplateColumns: 'auto 1fr 1fr auto', gap: '1rem', alignItems: 'start', marginBottom: '1rem', padding: '1rem', background: 'var(--surface-bg)', borderRadius: '12px', border: '1px solid var(--surface-border)' }}>
+            <div style={{ marginTop: '1.8rem', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '28px', height: '28px', borderRadius: '50%', background: 'rgba(139,111,71,0.1)', color: 'var(--primary)', fontWeight: 'bold', fontSize: '0.8rem' }}>
+              {index + 1}
+            </div>
             <div className="input-group" style={{ marginBottom: 0 }}>
               <label className="input-label" style={{ fontSize: '0.85rem' }}>Diagnostic évoqué</label>
               <input type="text" className="input-field" placeholder="Ex: Tuberculose pulmonaire" value={diag.nom || ''} onChange={(e) => updateDiffDiagnostic(diag.id, 'nom', e.target.value)} />
@@ -108,9 +110,9 @@ function DiagnosticRetenu({ data, updateData }) {
               <label className="input-label" style={{ fontSize: '0.85rem' }}>Arguments pour l'écarter (Contre)</label>
               <textarea className="input-field" placeholder="Ex: Pas de sueurs nocturnes, BK crachats négatifs..." rows="2" style={{ resize: 'vertical' }} value={diag.arguments || ''} onChange={(e) => updateDiffDiagnostic(diag.id, 'arguments', e.target.value)} />
             </div>
-            <div style={{ marginTop: '1.5rem' }}>
-              <button type="button" onClick={() => removeDiffDiagnostic(diag.id)} style={{ padding: '0.6rem', backgroundColor: '#fee2e2', color: '#ef4444', border: 'none', borderRadius: '6px', cursor: 'pointer' }} title="Supprimer">
-                <Trash2 size={16} />
+            <div style={{ marginTop: '1.6rem' }}>
+              <button type="button" onClick={() => removeDiffDiagnostic(diag.id)} style={{ padding: '0.6rem', backgroundColor: 'transparent', color: 'var(--text-light)', border: '1px solid var(--surface-border)', borderRadius: '8px', cursor: 'pointer', transition: 'all 0.2s ease' }} onMouseEnter={(e) => { e.currentTarget.style.color = '#ef4444'; e.currentTarget.style.borderColor = '#ef4444'; e.currentTarget.style.background = '#fff0f0'; }} onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--text-light)'; e.currentTarget.style.borderColor = 'var(--surface-border)'; e.currentTarget.style.background = 'transparent'; }} title="Supprimer">
+                <Trash2 size={18} />
               </button>
             </div>
           </div>
