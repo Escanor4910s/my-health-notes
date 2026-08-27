@@ -55,6 +55,8 @@ function ExportSection({ data }) {
       transfusion: 'Transfusion(s) sanguine(s)'
     });
 
+    const institution = getInstitutionSettings();
+
     return `
       <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
       <head>
@@ -89,12 +91,14 @@ function ExportSection({ data }) {
       </head>
       <body>
         <div class="header">
-          <p>RÉPUBLIQUE DU SÉNÉGAL</p>
-          <p>MINISTÈRE DE LA SANTÉ ET DE L'ACTION SOCIALE</p>
-          <p>CENTRE HOSPITALIER NATIONAL UNIVERSITAIRE</p>
+          <p>${escapeHtml(institution.ligne1)}</p>
+          <p>${escapeHtml(institution.ligne2)}</p>
+          <p>${escapeHtml(institution.ligne3)}</p>
+          ${institution.ville ? `<p>${escapeHtml(institution.ville)}</p>` : ''}
           <br/>
-          <h1>DOSSIER D'OBSERVATION MÉDICALE</h1>
+          <h1>${escapeHtml(institution.titreDocument)}</h1>
         </div>
+
         
         <div class="section">
           <h2>1. IDENTITÉ DU PATIENT</h2>
