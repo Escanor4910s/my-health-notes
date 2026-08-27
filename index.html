@@ -11,6 +11,20 @@
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary" />
     <title>ObsMed — Observation médicale structurée</title>
+    <!-- Anti-FOUC: Apply theme IMMEDIATELY before React renders (prevents brown flash) -->
+    <script>
+      (function() {
+        try {
+          var accent = localStorage.getItem('obsmed-accenttheme') || 'crimson';
+          var bg = localStorage.getItem('obsmed-bgtheme') || 'frost';
+          var dark = localStorage.getItem('obsmed-dark') === 'true';
+          var el = document.documentElement;
+          el.setAttribute('data-accent-theme', accent);
+          el.setAttribute('data-bg-theme', bg);
+          el.setAttribute('data-theme', dark ? 'dark' : 'light');
+        } catch(e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

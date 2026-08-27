@@ -1415,10 +1415,9 @@ body, .app-sidebar, .glass-panel, .input-field, .checkbox-container,
 }
 
 /* ═══════════════════════════════════════════════════════════
-   RESPONSIVE DESIGN (MOBILE)
+   RESPONSIVE DESIGN — TABLET (max 1024px)
    ═══════════════════════════════════════════════════════════ */
-@media (max-width: 768px) {
-  /* Root overflow protection */
+@media (max-width: 1024px) {
   html, body {
     overflow-x: hidden !important;
   }
@@ -1426,115 +1425,394 @@ body, .app-sidebar, .glass-panel, .input-field, .checkbox-container,
     overflow-x: hidden !important;
   }
 
-  /* Main Container Padding */
+  /* Sidebar: hidden by default on tablet/mobile, slides in */
+  .app-sidebar {
+    position: fixed !important;
+    top: 0; left: 0;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    z-index: 9998;
+    transform: translateX(-100%);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 4px 0 30px rgba(0,0,0,0.15);
+  }
+  .app-sidebar.mobile-open {
+    transform: translateX(0) !important;
+  }
+  /* Collapsed sidebar: still hidden, no partial reveal on mobile */
+  .app-sidebar.collapsed {
+    transform: translateX(-100%) !important;
+    width: 280px !important;
+    min-width: 280px !important;
+  }
+  .app-sidebar.collapsed.mobile-open {
+    transform: translateX(0) !important;
+  }
+
+  /* Main: full width */
+  .app-main {
+    padding: 1.5rem !important;
+    min-width: 0 !important;
+  }
+
+  /* Collapse button: hide on tablet/mobile */
+  .desktop-only {
+    display: none !important;
+  }
+
+  /* FAB menu visible on tablet */
+  .fab-menu {
+    display: flex !important;
+  }
+
+  /* Mobile dashboard button visible */
+  .mobile-floating-dashboard-btn {
+    display: flex !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE DESIGN — MOBILE (max 768px)
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* ---------- ROOT / LAYOUT ---------- */
+  html, body {
+    overflow-x: hidden !important;
+    -webkit-text-size-adjust: 100%;
+  }
+  .app-layout {
+    overflow-x: hidden !important;
+    flex-direction: column !important;
+  }
   .app-main {
     padding: 0.75rem !important;
+    flex: 1 !important;
+    min-width: 0 !important;
+    overflow-x: hidden !important;
   }
-  
-  /* The inner container gets max-width: 100vw */
   .app-main > div {
-    max-width: 100vw !important;
+    max-width: 100% !important;
     box-sizing: border-box !important;
   }
-  
+
+  /* ---------- GLASS PANELS ---------- */
   .glass-panel {
     padding: 1.25rem !important;
     border-radius: 12px !important;
+    overflow-x: hidden !important;
   }
 
-  /* Section headers */
-  h2, .glass-panel h2 {
-    font-size: 1.3rem !important;
-  }
-
-  /* Section Indicators (Pills) scrolling */
-  .section-indicators {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    padding-bottom: 0.5rem;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none; /* Firefox */
-    max-width: 100%;
-  }
-  .section-indicators::-webkit-scrollbar {
-    display: none; /* Chrome/Safari */
-  }
-
-  /* Progress Bar Alignment */
-  .progress-bar-container {
-    padding-top: 0.5rem;
-    max-width: 100%;
-  }
-  .progress-bar-container span {
+  /* ---------- TYPOGRAPHY ---------- */
+  h1 { font-size: 1.6rem !important; }
+  h2, .glass-panel h2 { font-size: 1.3rem !important; }
+  h3 { font-size: 1.1rem !important; }
+  p, span, li, label, td, th {
     word-break: break-word;
-    white-space: normal;
+    overflow-wrap: anywhere;
   }
-  
-  /* Fix hardcoded grids in sections */
+
+  /* ---------- SHORTCUT CAROUSEL ---------- */
+  .shortcut-carousel-container {
+    height: 60px !important;
+    margin-bottom: 1rem !important;
+  }
+
+  /* ---------- SECTION INDICATORS (PILLS) ---------- */
+  .section-indicators {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    padding-bottom: 0.5rem !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    max-width: 100% !important;
+  }
+  .section-indicators::-webkit-scrollbar { display: none; }
+
+  /* ---------- PROGRESS BAR ---------- */
+  .progress-bar-container {
+    padding-top: 0.5rem !important;
+    max-width: 100% !important;
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+  }
+  .progress-label {
+    white-space: nowrap !important;
+  }
+
+  /* ---------- GRIDS: collapse all to 1-column on mobile ---------- */
   div[style*="grid-template-columns"],
   div[style*="gridTemplateColumns"] {
     grid-template-columns: 1fr !important;
-    gap: 1rem !important;
+    gap: 0.75rem !important;
   }
 
-  /* Flex wrapping */
-  div[style*="display: flex"],
-  div[style*="display:flex"] {
+  /* ---------- FLEX: allow wrapping ---------- */
+  /* Only apply to flex containers that are NOT explicitly overflow-scrolling */
+  .glass-panel div[style*="display: flex"],
+  .glass-panel div[style*="display:flex"],
+  .section-content div[style*="display: flex"],
+  .section-content div[style*="display:flex"] {
     flex-wrap: wrap !important;
+    min-width: 0 !important;
   }
 
-  /* Navigation footer */
+  /* ---------- NAVIGATION FOOTER ---------- */
   .nav-footer {
     flex-direction: column !important;
-    gap: 1rem !important;
+    gap: 0.75rem !important;
   }
   .nav-footer-btn {
     width: 100% !important;
-    font-size: 0.9rem !important;
-    padding: 0.75rem !important;
+    font-size: 0.95rem !important;
+    padding: 0.85rem 1rem !important;
+    justify-content: center !important;
+  }
+  .nav-footer-btn.invisible {
+    display: none !important;
   }
 
-  /* Buttons */
-  .chip-btn, .btn {
+  /* ---------- BUTTONS ---------- */
+  .chip-btn, .btn, .btn-primary {
     font-size: 0.9rem !important;
-    padding: 0.5rem 1rem !important;
+  }
+  /* Prevent buttons from overflowing */
+  button[style*="width"] {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
   }
 
-  /* IPPA tabs */
-  .ippa-tabs {
+  /* ---------- TABS / SCROLLABLE STRIPS ---------- */
+  .ippa-tabs, .account-tabs-wrapper, .coverflow-tabs {
     flex-wrap: nowrap !important;
     overflow-x: auto !important;
     max-width: 100% !important;
     -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
+    scrollbar-width: none !important;
+    gap: 0.25rem !important;
   }
-  .ippa-tabs::-webkit-scrollbar {
-    display: none;
-  }
+  .ippa-tabs::-webkit-scrollbar,
+  .account-tabs-wrapper::-webkit-scrollbar { display: none; }
 
-  /* Symptom cards */
+  /* ---------- SYMPTOM & FORM CARDS ---------- */
   .symptom-card, .symptom-header {
     padding: 1rem !important;
     flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+  }
+  .symptom-dropdown-header {
+    padding: 0.85rem 1rem !important;
+    font-size: 0.95rem !important;
+  }
+  .symptom-dropdown-content {
+    padding: 1rem !important;
   }
 
-  /* Forms */
-  input, select, textarea, .input-field, .form-control {
+  /* ---------- FORMS / INPUTS ---------- */
+  input, select, textarea,
+  .input-field, .form-control, .premium-input {
     width: 100% !important;
     max-width: 100% !important;
     box-sizing: border-box !important;
+    font-size: 1rem !important; /* Prevents iOS zoom on focus */
   }
-
-  /* Text overflow */
-  p, span, div, h1, h2, h3, h4, h5, h6 {
-    word-break: break-word;
-  }
-
-  /* Fix split inputs (e.g. TAS / TAD) */
-  .flex-row-mobile-wrap {
+  /* Vitals row: stack them */
+  .vitals-row, .flex-row-mobile-wrap {
     flex-direction: column !important;
+    gap: 0.75rem !important;
+  }
+
+  /* ---------- ACCOUNT / STATS MODALS ---------- */
+  .account-modal-content {
+    width: 96% !important;
+    max-width: 100% !important;
+    height: 92vh !important;
+    max-height: 95vh !important;
+    border-radius: 20px !important;
+    margin: auto !important;
+  }
+  .account-layout {
+    flex-direction: column !important;
+    min-height: 0 !important;
+  }
+  .account-tabs-wrapper {
+    padding: 0.75rem 0.5rem !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--surface-border) !important;
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    min-height: unset !important;
+    width: 100% !important;
+    flex-shrink: 0 !important;
+  }
+  .account-body {
+    padding: 1.25rem 1rem !important;
+    overflow-y: auto !important;
+  }
+  .account-modal-header {
+    flex-wrap: wrap !important;
+    gap: 0.75rem !important;
+    padding: 1rem 1.25rem !important;
+  }
+  .account-modal-header h2 {
+    font-size: 1.15rem !important;
+  }
+
+  /* ---------- SUBSCRIPTION CARDS (inside AccountModal) ---------- */
+  .subscription-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.25rem !important;
+  }
+  .subscription-card {
+    padding: 1.25rem 1rem !important;
+    border-radius: 20px !important;
+  }
+  .subscription-card h4 { font-size: 1.15rem !important; }
+  .subscription-card p { font-size: 0.85rem !important; }
+  .subscription-card .price-display { font-size: 1.75rem !important; }
+  .subscription-card ul li { font-size: 0.85rem !important; }
+
+  /* ---------- DASHBOARD GRID (folder cards) ---------- */
+  .folders-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+  }
+  .premium-header {
+    border-radius: 16px !important;
+    margin: 0 0 2rem 0 !important;
+    padding: 0.65rem 1rem !important;
+  }
+  .header-brand-name { font-size: 1.5rem !important; }
+  .search-pro {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .btn-nouveau-dossier {
+    padding: 0.6rem !important;
+    border-radius: 50% !important;
+  }
+  .btn-nouveau-dossier span { display: none !important; }
+  .espace-personnel-text { display: none !important; }
+  .espace-personnel-btn { padding: 0.35rem !important; }
+  .header-right-actions { gap: 0.5rem !important; }
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+
+  /* ---------- EXPORT SECTION ---------- */
+  .export-actions-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+  .export-action-btn {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  /* ---------- OVERVIEW (APERCU) ---------- */
+  .apercu-page {
+    padding: 1.5rem 1rem !important;
+  }
+  .apercu-main-title { font-size: 1.8rem !important; }
+  .apercu-page-title {
+    font-size: 1.1rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  /* ---------- TAG SYSTEM ---------- */
+  .premium-tag-bank {
+    gap: 0.5rem !important;
+  }
+  .premium-tag {
+    font-size: 0.85rem !important;
+    padding: 0.5rem 1rem !important;
+  }
+
+  /* ---------- TAG MANAGER MODAL ---------- */
+  .tag-manager-modal {
+    width: 96% !important;
+    max-height: 90vh !important;
+    border-radius: 16px !important;
+  }
+
+  /* ---------- COMMAND PALETTE ---------- */
+  [class*="command-palette"] {
+    width: 96% !important;
+    max-width: 100% !important;
+    border-radius: 16px !important;
+  }
+
+  /* ---------- VERSION HISTORY PANEL ---------- */
+  [class*="version-history"],
+  [style*="width: 420px"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 16px 16px 0 0 !important;
+    bottom: 0 !important;
+    top: auto !important;
+    height: 80vh !important;
+  }
+
+  /* ---------- ONBOARDING TUTORIAL ---------- */
+  [class*="tutorial"],
+  [class*="onboarding"] {
+    width: 96% !important;
+    max-width: 100% !important;
+    border-radius: 16px !important;
+  }
+
+  /* ---------- TEMPLATE SELECTOR MODAL ---------- */
+  .ts-glass-panel {
+    border-radius: 16px !important;
+    height: 95vh !important;
+  }
+  .ts-cards-grid {
+    flex-direction: column !important;
+    padding: 1rem 1.25rem 2rem 1.25rem !important;
+    gap: 1rem !important;
+  }
+  .ts-header {
+    padding: 1.5rem 1.25rem 1rem 1.25rem !important;
+  }
+  .ts-title { font-size: 1.6rem !important; }
+  .ts-card {
+    padding: 1.75rem 1.25rem !important;
+  }
+  .icon-wrapper {
+    width: 70px !important;
+    height: 70px !important;
+    margin-bottom: 1.25rem !important;
+  }
+  /* Upload zone on mobile */
+  .ts-glass-panel div[style*="padding: '0 4rem"] {
+    padding: 0 1.25rem 2rem 1.25rem !important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   RESPONSIVE DESIGN — SMALL MOBILE (max 480px)
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+  .app-main {
+    padding: 0.5rem !important;
+  }
+  .glass-panel {
+    padding: 1rem !important;
+    border-radius: 10px !important;
+  }
+  h2, .glass-panel h2 { font-size: 1.2rem !important; }
+
+  /* Force all padded inline styles to be safe */
+  div[style*="padding: '2rem"] {
+    padding: 1rem !important;
+  }
+
+  /* Vitals: force column layout on very small screens */
+  div[style*="display: flex"][style*="gap"] {
+    min-width: 0 !important;
+  }
+}
+
 
 /* --- Added for Lazy Loading --- */
 .loading-spinner {
