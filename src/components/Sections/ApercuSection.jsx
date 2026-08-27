@@ -4,7 +4,7 @@ import SymptomModal from '../UI/SymptomModal';
 import Markdown from '../UI/Markdown';
 import { askAI, compactDossier } from '../../lib/ai';
 
-function ApercuSection({ data }) {
+function ApercuSection({ data, onNavigate }) {
   const d = (section, key) => data?.[section]?.[key];
   const or = (val, fallback = 'Néant') => val || fallback;
   const Neant = () => <span style={{ color: 'var(--text-light)', fontStyle: 'italic' }}>Néant</span>;

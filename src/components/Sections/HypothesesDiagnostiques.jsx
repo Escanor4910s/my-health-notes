@@ -5,24 +5,28 @@ import { Trash2 } from 'lucide-react';
 function HypothesesDiagnostiques({ data, updateData }) {
   const [hypotheses, setHypotheses] = useState(data?.hypotheses || [{ id: Date.now() }]);
 
-  useEffect(() => {
-    if (updateData) {
-      updateData({ hypotheses });
-    }
-  }, [hypotheses, updateData]);
-
   const updateHypothesis = (index, field, value) => {
-    setHypotheses((prev) =>
-      prev.map((h, i) => (i === index ? { ...h, [field]: value } : h))
-    );
+    setHypotheses((prev) => {
+      const newArr = prev.map((h, i) => (i === index ? { ...h, [field]: value } : h));
+      if (updateData) updateData({ hypotheses: newArr });
+      return newArr;
+    });
   };
 
   const addHypothesis = () => {
-    setHypotheses((prev) => [...prev, { id: Date.now() }]);
+    setHypotheses((prev) => {
+      const newArr = [...prev, { id: Date.now() }];
+      if (updateData) updateData({ hypotheses: newArr });
+      return newArr;
+    });
   };
 
   const removeHypothesis = (index) => {
-    setHypotheses((prev) => prev.filter((_, i) => i !== index));
+    setHypotheses((prev) => {
+      const newArr = prev.filter((_, i) => i !== index);
+      if (updateData) updateData({ hypotheses: newArr });
+      return newArr;
+    });
   };
 
   return (

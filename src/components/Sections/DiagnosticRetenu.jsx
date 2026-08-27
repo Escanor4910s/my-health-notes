@@ -15,21 +15,22 @@ function DiagnosticRetenu({ data, updateData }) {
     updateData({ [key]: type === 'checkbox' ? checked : value });
   };
 
-  useEffect(() => {
-    updateData({ diffDiagnostics });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [diffDiagnostics]);
-
   const addDiffDiagnostic = () => {
-    setDiffDiagnostics([...diffDiagnostics, { id: Date.now(), nom: '', arguments: '' }]);
+    const newArr = [...diffDiagnostics, { id: Date.now(), nom: '', arguments: '' }];
+    setDiffDiagnostics(newArr);
+    updateData({ diffDiagnostics: newArr });
   };
 
   const removeDiffDiagnostic = (id) => {
-    setDiffDiagnostics(diffDiagnostics.filter(d => d.id !== id));
+    const newArr = diffDiagnostics.filter(d => d.id !== id);
+    setDiffDiagnostics(newArr);
+    updateData({ diffDiagnostics: newArr });
   };
 
   const updateDiffDiagnostic = (id, field, value) => {
-    setDiffDiagnostics(diffDiagnostics.map(d => d.id === id ? { ...d, [field]: value } : d));
+    const newArr = diffDiagnostics.map(d => d.id === id ? { ...d, [field]: value } : d);
+    setDiffDiagnostics(newArr);
+    updateData({ diffDiagnostics: newArr });
   };
 
   const AccordionHeader = ({ label, sectionKey }) => (

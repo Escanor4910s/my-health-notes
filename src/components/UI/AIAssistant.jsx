@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Sparkles, X, Send, Loader2, Stethoscope, FileText, FlaskConical, Copy, Check } from 'lucide-react';
+import { X, Send, Loader2, Stethoscope, FileText, FlaskConical, Copy, Check } from 'lucide-react';
 import { askAI, compactDossier } from '../../lib/ai';
 import Markdown from './Markdown';
 import Logo8G from '../../assets/8G-logo.jpg';

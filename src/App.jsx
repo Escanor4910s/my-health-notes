@@ -607,8 +607,11 @@ function AppContent() {
     try {
       const { error } = await supabase.from('patients').delete().eq('patient_id_local', id);
       if (error) throw error;
-      setPatients(prev => prev.filter(p => p.id !== id));
-      localStorage.setItem('obsmed-patients', JSON.stringify(patients.filter(p => p.id !== id)));
+      setPatients(prev => {
+        const updated = prev.filter(p => p.id !== id);
+        localStorage.setItem('obsmed-patients', JSON.stringify(updated));
+        return updated;
+      });
     } catch (err) {
       console.error('Erreur suppression:', err);
     }

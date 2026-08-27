@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Wifi, WifiOff, RefreshCw, Check, CloudOff } from 'lucide-react';
+import { RefreshCw, Check } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
 const QUEUE_KEY = 'obsmed-sync-queue';
@@ -18,7 +18,7 @@ export function addToSyncQueue(action) {
     const queue = getSyncQueue();
     queue.push(action);
     localStorage.setItem(QUEUE_KEY, JSON.stringify(queue));
-    window.dispatchEvent(new Event('sync-queue-updated'));
+    window.dispatchEvent(new Event('obsmed-sync-queue-updated'));
   } catch (e) {
     console.error('Error adding to sync queue', e);
   }
@@ -26,7 +26,7 @@ export function addToSyncQueue(action) {
 
 export function clearSyncQueue() {
   localStorage.setItem(QUEUE_KEY, JSON.stringify([]));
-  window.dispatchEvent(new Event('sync-queue-updated'));
+  window.dispatchEvent(new Event('obsmed-sync-queue-updated'));
 }
 
 const SyncManager = ({ session }) => {
@@ -42,8 +42,8 @@ const SyncManager = ({ session }) => {
 
   useEffect(() => {
     updateQueueCount();
-    window.addEventListener('sync-queue-updated', updateQueueCount);
-    return () => window.removeEventListener('sync-queue-updated', updateQueueCount);
+    window.addEventListener('obsmed-sync-queue-updated', updateQueueCount);
+    return () => window.removeEventListener('obsmed-sync-queue-updated', updateQueueCount);
   }, [updateQueueCount]);
 
   const processQueue = useCallback(async () => {

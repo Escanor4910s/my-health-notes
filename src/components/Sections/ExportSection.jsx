@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Download, FileText, Sparkles, Loader2, FileDown, FileEdit, FileSignature } from 'lucide-react';
+import { Loader2, FileDown, FileEdit, FileSignature } from 'lucide-react';
 import { askAI, compactDossier } from '../../lib/ai';
 
 // Helper: convert checkbox data to a readable string
