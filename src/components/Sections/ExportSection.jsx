@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { Loader2, FileDown, FileEdit, FileSignature } from 'lucide-react';
+import { Loader2, FileDown, FileEdit, FileSignature, Settings, X } from 'lucide-react';
 import { askAI, compactDossier } from '../../lib/ai';
+import { escapeHtml } from '../../lib/html';
+import { getInstitutionSettings, saveInstitutionSettings } from '../../lib/institution';
 
 // Helper: convert checkbox data to a readable string
 const listChecked = (data, mapping) => {
@@ -11,11 +13,15 @@ const listChecked = (data, mapping) => {
     .join(', ') || 'Aucun';
 };
 
-const val = (obj, key) => obj?.[key] || '';
+const val = (obj, key) => escapeHtml(obj?.[key] || '');
+
 
 function ExportSection({ data }) {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState('');
+  const [showInstitution, setShowInstitution] = useState(false);
+  const [institution, setInstitution] = useState(getInstitutionSettings());
+
 
 
   const generateHTMLContent = () => {
@@ -52,6 +58,8 @@ function ExportSection({ data }) {
       transfusion: 'Transfusion(s) sanguine(s)'
     });
 
+    const institution = getInstitutionSettings();
+
     return `
       <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
       <head>
@@ -86,12 +94,14 @@ function ExportSection({ data }) {
       </head>
       <body>
         <div class="header">
-          <p>RÉPUBLIQUE DU SÉNÉGAL</p>
-          <p>MINISTÈRE DE LA SANTÉ ET DE L'ACTION SOCIALE</p>
-          <p>CENTRE HOSPITALIER NATIONAL UNIVERSITAIRE</p>
+          <p>${escapeHtml(institution.ligne1)}</p>
+          <p>${escapeHtml(institution.ligne2)}</p>
+          <p>${escapeHtml(institution.ligne3)}</p>
+          ${institution.ville ? `<p>${escapeHtml(institution.ville)}</p>` : ''}
           <br/>
-          <h1>DOSSIER D'OBSERVATION MÉDICALE</h1>
+          <h1>${escapeHtml(institution.titreDocument)}</h1>
         </div>
+
         
         <div class="section">
           <h2>1. IDENTITÉ DU PATIENT</h2>
@@ -113,7 +123,7 @@ function ExportSection({ data }) {
           <h2>2. MOTIF DE CONSULTATION</h2>
           <p><span class="label">Motif principal :</span> ${val(motif,'motif_principal')}</p>
           <p><span class="label">Admission le :</span> ${val(motif,'date_admission')} à ${val(motif,'heure_admission')}</p>
-          ${motif.type_arrivee ? `<p><span class="label">Mode d'arrivée :</span> ${motif.type_arrivee} — ${val(motif,'details_arrivee')}</p>` : ''}
+          ${motif.type_arrivee ? `<p><span class="label">Mode d'arrivée :</span> ${escapeHtml(motif.type_arrivee)} — ${val(motif,'details_arrivee')}</p>` : ''}
         </div>
         
         <div class="section">
@@ -129,12 +139,12 @@ function ExportSection({ data }) {
           <h2>4. ANTÉCÉDENTS</h2>
           <h3>Médicaux</h3>
           <p>${atcdMedicaux || 'RAS'}</p>
-          ${atcd.medicaux_details ? `<p><i>${atcd.medicaux_details}</i></p>` : ''}
+          ${atcd.medicaux_details ? `<p><i>${escapeHtml(atcd.medicaux_details)}</i></p>` : ''}
           <h3>Chirurgicaux</h3>
           <p>${val(atcd,'chirurgicaux_details') || 'RAS'}</p>
           <h3>Gynéco-Obstétricaux</h3>
           <p>DDR: ${val(atcd,'ddr')} | Gestité: ${val(atcd,'gestite')} Parité: ${val(atcd,'parite')} | Enfants vivants: ${val(atcd,'enfants_vivants')}</p>
-          ${atcd.gyneco_details ? `<p><i>${atcd.gyneco_details}</i></p>` : ''}
+          ${atcd.gyneco_details ? `<p><i>${escapeHtml(atcd.gyneco_details)}</i></p>` : ''}
           <h3>Mode de vie & Toxiques</h3>
           <p>${val(atcd,'mode_vie_details') || 'RAS'}</p>
           <h3>Allergies</h3>
@@ -151,16 +161,16 @@ function ExportSection({ data }) {
             <tr><td class="label-cell">SpO2</td><td>${val(eg,'spo2')} %</td><td class="label-cell">Diurèse</td><td>${val(eg,'diurese')} mL/24h</td></tr>
           </table>
           
-          ${pleuro.pleuro_notes ? `<h3>Pleuro-Pulmonaire</h3><p>${pleuro.pleuro_notes}</p>` : ''}
-          ${cardio.cardio_notes ? `<h3>Cardio-Circulatoire</h3><p>${cardio.cardio_notes}</p>` : ''}
-          ${digestif.digestif_notes ? `<h3>Digestif</h3><p>${digestif.digestif_notes}</p>` : ''}
-          ${neuro.neuro_notes ? `<h3>Neurologique</h3><p>${neuro.neuro_notes}</p>` : ''}
-          ${uro.uro_notes ? `<h3>Uro-Néphrologique</h3><p>${uro.uro_notes}</p>` : ''}
-          ${loco.locomoteur_notes ? `<h3>Locomoteur</h3><p>${loco.locomoteur_notes}</p>` : ''}
-          ${dermato.dermato_notes ? `<h3>Dermatologique</h3><p>${dermato.dermato_notes}</p>` : ''}
-          ${orl.orl_notes ? `<h3>ORL</h3><p>${orl.orl_notes}</p>` : ''}
-          ${gang.ganglions_notes ? `<h3>Aires Ganglionnaires</h3><p>${gang.ganglions_notes}</p>` : ''}
-          ${gyneco.gyneco_exam_notes ? `<h3>Gynécologique</h3><p>${gyneco.gyneco_exam_notes}</p>` : ''}
+          ${pleuro.pleuro_notes ? `<h3>Pleuro-Pulmonaire</h3><p>${escapeHtml(pleuro.pleuro_notes)}</p>` : ''}
+          ${cardio.cardio_notes ? `<h3>Cardio-Circulatoire</h3><p>${escapeHtml(cardio.cardio_notes)}</p>` : ''}
+          ${digestif.digestif_notes ? `<h3>Digestif</h3><p>${escapeHtml(digestif.digestif_notes)}</p>` : ''}
+          ${neuro.neuro_notes ? `<h3>Neurologique</h3><p>${escapeHtml(neuro.neuro_notes)}</p>` : ''}
+          ${uro.uro_notes ? `<h3>Uro-Néphrologique</h3><p>${escapeHtml(uro.uro_notes)}</p>` : ''}
+          ${loco.locomoteur_notes ? `<h3>Locomoteur</h3><p>${escapeHtml(loco.locomoteur_notes)}</p>` : ''}
+          ${dermato.dermato_notes ? `<h3>Dermatologique</h3><p>${escapeHtml(dermato.dermato_notes)}</p>` : ''}
+          ${orl.orl_notes ? `<h3>ORL</h3><p>${escapeHtml(orl.orl_notes)}</p>` : ''}
+          ${gang.ganglions_notes ? `<h3>Aires Ganglionnaires</h3><p>${escapeHtml(gang.ganglions_notes)}</p>` : ''}
+          ${gyneco.gyneco_exam_notes ? `<h3>Gynécologique</h3><p>${escapeHtml(gyneco.gyneco_exam_notes)}</p>` : ''}
         </div>
         
         <div class="section">
@@ -171,37 +181,37 @@ function ExportSection({ data }) {
         
         <div class="section">
           <h2>7. HYPOTHÈSES DIAGNOSTIQUES</h2>
-          ${hyp.hypothese_1 ? `<p><span class="label">1ère Hypothèse :</span> ${hyp.hypothese_1}</p><p>${val(hyp,'arguments_1')}</p>` : '<p>Aucune hypothèse formulée.</p>'}
-          ${hyp.hypothese_2 ? `<p><span class="label">2ème Hypothèse :</span> ${hyp.hypothese_2}</p><p>${val(hyp,'arguments_2')}</p>` : ''}
-          ${hyp.hypothese_3 ? `<p><span class="label">3ème Hypothèse :</span> ${hyp.hypothese_3}</p><p>${val(hyp,'arguments_3')}</p>` : ''}
+          ${hyp.hypothese_1 ? `<p><span class="label">1ère Hypothèse :</span> ${escapeHtml(hyp.hypothese_1)}</p><p>${val(hyp,'arguments_1')}</p>` : '<p>Aucune hypothèse formulée.</p>'}
+          ${hyp.hypothese_2 ? `<p><span class="label">2ème Hypothèse :</span> ${escapeHtml(hyp.hypothese_2)}</p><p>${val(hyp,'arguments_2')}</p>` : ''}
+          ${hyp.hypothese_3 ? `<p><span class="label">3ème Hypothèse :</span> ${escapeHtml(hyp.hypothese_3)}</p><p>${val(hyp,'arguments_3')}</p>` : ''}
         </div>
         
         <div class="section">
           <h2>8. BILAN PARACLINIQUE DEMANDÉ</h2>
-          ${val(bilan,'bio_autres') ? `<h3>Biologique</h3><p>${bilan.bio_autres}</p>` : ''}
-          ${val(bilan,'bio_creatinine_mg_l') ? `<p>Créatininémie: ${bilan.bio_creatinine_mg_l} mg/L</p>` : ''}
-          ${val(bilan,'radio_autres') ? `<h3>Imagerie</h3><p>${bilan.radio_autres}</p>` : ''}
-          ${val(bilan,'explo_autres') ? `<h3>Explorations diverses</h3><p>${bilan.explo_autres}</p>` : ''}
+          ${val(bilan,'bio_autres') ? `<h3>Biologique</h3><p>${escapeHtml(bilan.bio_autres)}</p>` : ''}
+          ${val(bilan,'bio_creatinine_mg_l') ? `<p>Créatininémie: ${escapeHtml(bilan.bio_creatinine_mg_l)} mg/L</p>` : ''}
+          ${val(bilan,'radio_autres') ? `<h3>Imagerie</h3><p>${escapeHtml(bilan.radio_autres)}</p>` : ''}
+          ${val(bilan,'explo_autres') ? `<h3>Explorations diverses</h3><p>${escapeHtml(bilan.explo_autres)}</p>` : ''}
         </div>
         
         <div class="section">
           <h2>9. DIAGNOSTIC RETENU</h2>
           <p>${val(diag,'diagnostic_retenu')}</p>
-          ${diag.arguments_diagnostic ? `<p><span class="label">Arguments :</span> ${diag.arguments_diagnostic}</p>` : ''}
+          ${diag.arguments_diagnostic ? `<p><span class="label">Arguments :</span> ${escapeHtml(diag.arguments_diagnostic)}</p>` : ''}
         </div>
         
         <div class="section">
           <h2>10. TRAITEMENT ET SURVEILLANCE</h2>
-          ${ttt.ttt_etiologique ? `<h3>Étiologique</h3><p>${ttt.ttt_etiologique}</p>` : ''}
-          ${ttt.ttt_symptomatique ? `<h3>Symptomatique</h3><p>${ttt.ttt_symptomatique}</p>` : ''}
-          ${ttt.ttt_adjuvant ? `<h3>Adjuvant</h3><p>${ttt.ttt_adjuvant}</p>` : ''}
-          ${ttt.surveillance_clinique ? `<h3>Surveillance clinique</h3><p>${ttt.surveillance_clinique}</p>` : ''}
-          ${ttt.surveillance_paraclinique ? `<h3>Surveillance paraclinique</h3><p>${ttt.surveillance_paraclinique}</p>` : ''}
+          ${ttt.ttt_etiologique ? `<h3>Étiologique</h3><p>${escapeHtml(ttt.ttt_etiologique)}</p>` : ''}
+          ${ttt.ttt_symptomatique ? `<h3>Symptomatique</h3><p>${escapeHtml(ttt.ttt_symptomatique)}</p>` : ''}
+          ${ttt.ttt_adjuvant ? `<h3>Adjuvant</h3><p>${escapeHtml(ttt.ttt_adjuvant)}</p>` : ''}
+          ${ttt.surveillance_clinique ? `<h3>Surveillance clinique</h3><p>${escapeHtml(ttt.surveillance_clinique)}</p>` : ''}
+          ${ttt.surveillance_paraclinique ? `<h3>Surveillance paraclinique</h3><p>${escapeHtml(ttt.surveillance_paraclinique)}</p>` : ''}
         </div>
         
         <div class="section">
           <h2>11. CONCLUSION ET PRONOSTIC</h2>
-          ${concl.pronostic ? `<p><span class="label">Pronostic :</span> ${concl.pronostic}</p>` : ''}
+          ${concl.pronostic ? `<p><span class="label">Pronostic :</span> ${escapeHtml(concl.pronostic)}</p>` : ''}
           <p>${val(concl,'conclusion')}</p>
         </div>
         

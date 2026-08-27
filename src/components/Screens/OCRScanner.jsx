@@ -20,17 +20,16 @@ export default function OCRScanner({ onScanComplete }) {
     setError('');
 
     try {
-      const worker = await Tesseract.createWorker({
+      const worker = await Tesseract.createWorker('fra+eng', 1, {
         logger: m => {
           if (m.status === 'recognizing text') {
             setProgress(Math.round(m.progress * 100));
           }
         }
       });
-      await worker.loadLanguage('fra+eng');
-      await worker.initialize('fra+eng');
       const { data: { text } } = await worker.recognize(file);
       await worker.terminate();
+
 
       // Extraction intelligente par IA, avec repli sur les heuristiques locales
       try {
@@ -64,12 +63,13 @@ export default function OCRScanner({ onScanComplete }) {
     // Basic extraction heuristics
     const results = {};
     const lowerText = text.toLowerCase();
-    
+
     const extractVal = (keywords) => {
       for (const kw of keywords) {
-        const regex = new RegExp(kw + '\\s*[:=]?\\s*(\\d+[.,]?\\d*)', 'i');
+        // Capture un nombre avec séparateurs (espace, virgule, point) éventuels
+        const regex = new RegExp(kw + '\\s*[:=]?\\s*(\\d[\\d\\s,.]*)', 'i');
         const match = lowerText.match(regex);
-        if (match) return match[1].replace(',', '.');
+        if (match) return match[1].replace(/\s/g, '').replace(',', '.');
       }
       return '';
     };
@@ -78,11 +78,17 @@ export default function OCRScanner({ onScanComplete }) {
     results.leucocytes = extractVal(['leucocytes', 'globules blancs', 'gb', 'wbc']);
     results.plaquettes = extractVal(['plaquettes', 'plt', 'platelets']);
     results.creatinine = extractVal(['créatinine', 'creatininemie', 'creat']);
+    results.uree = extractVal(['urée', 'uree', 'urée sanguine']);
     results.glycemie = extractVal(['glycémie', 'glucose', 'glycemie a jeun']);
     results.crp = extractVal(['crp', 'protéine c réactive']);
+    results.natremie = extractVal(['natrémie', 'natremie', 'sodium', 'na+']);
+    results.kaliemie = extractVal(['kaliémie', 'kaliemie', 'potassium', 'k+']);
+    results.asat = extractVal(['asat', 'tgo', 'sgot']);
+    results.alat = extractVal(['alat', 'tgp', 'sgpt']);
 
     onScanComplete(results, text);
   };
+
 
   return (
     <div style={{ background: 'var(--surface-border)', padding: '1.5rem', borderRadius: '12px', marginBottom: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
