@@ -92,7 +92,8 @@ export default function AIAssistant({ formData, shouldPulse }) {
           display: flex; align-items: center; justify-content: center;
           overflow: hidden;
         }
-        /* Base Layer: White Bg, Black Motif */
+
+        /* --- LIGHT MODE / DEFAULT --- */
         .widget-layer-base {
           background: var(--surface);
           opacity: 1;
@@ -100,17 +101,33 @@ export default function AIAssistant({ formData, shouldPulse }) {
         .widget-layer-base img {
           mix-blend-mode: multiply;
         }
-        /* Hover Layer: Primary Bg, White Motif */
         .widget-layer-hover {
           background: var(--primary);
           opacity: 0;
         }
         .widget-layer-hover img {
-          filter: invert(1);
-          mix-blend-mode: lighten;
+          filter: invert(1); /* Motif becomes white, Bg becomes black */
+          mix-blend-mode: screen; /* Black disappears */
         }
+
+        /* Hover Transitions */
         .widget-8g-btn:not(.is-open):hover .widget-layer-base { opacity: 0; }
         .widget-8g-btn:not(.is-open):hover .widget-layer-hover { opacity: 1; }
+
+        /* Modal header logo */
+        .ai-modal-logo {
+           mix-blend-mode: multiply;
+        }
+
+        /* --- DARK MODE OVERRIDES --- */
+        html[data-theme='dark'] .widget-layer-base img {
+          filter: invert(1);
+          mix-blend-mode: screen;
+        }
+        html[data-theme='dark'] .ai-modal-logo {
+           filter: invert(1);
+           mix-blend-mode: screen;
+        }
 
         /* Crossfade animations for trending dual-logo effect */
         .logo-switcher {
@@ -208,7 +225,7 @@ export default function AIAssistant({ formData, shouldPulse }) {
             display: 'flex', alignItems: 'center', gap: '0.75rem' 
           }}>
             <div style={{ width: '36px', height: '36px', borderRadius: '12px', background: 'var(--surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 10px rgba(0,0,0,0.08)', overflow: 'hidden', border: '1px solid var(--surface-border)' }}>
-              <img src={Logo8G} alt="AI" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+              <img src={Logo8G} alt="AI" className="ai-modal-logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
             </div>
             <div style={{ flex: 1 }}>
               <strong style={{ fontSize: '1.05rem', color: 'var(--text-main)', letterSpacing: '-0.3px' }}>{assistantName}</strong>
