@@ -342,6 +342,35 @@ function AppContent() {
   }, []);
 
   useEffect(() => {
+    if (session?.user?.id) {
+      import('./lib/profile').then(({ loadUserProfile }) => {
+        loadUserProfile(session.user.id).then((profile) => {
+          if (profile) {
+            if (profile.theme) {
+              setDarkMode(profile.theme === 'dark');
+            }
+            if (profile.bg_theme) setBgTheme(profile.bg_theme);
+            if (profile.accent_theme) setAccentTheme(profile.accent_theme);
+          }
+        });
+      });
+    }
+  }, [session]);
+
+  useEffect(() => {
+    if (session?.user?.id) {
+      import('./lib/profile').then(({ updateProfileSettings }) => {
+        updateProfileSettings(session.user.id, {
+          theme: darkMode ? 'dark' : 'light',
+          accent_theme: accentTheme,
+          bg_theme: bgTheme
+        });
+      });
+    }
+  }, [darkMode, accentTheme, bgTheme, session]);
+
+
+  useEffect(() => {
     if (!session) return;
     const loadPatients = async () => {
       const { data, error } = await supabase.from('patients').select('*').order('created_at', { ascending: false });
