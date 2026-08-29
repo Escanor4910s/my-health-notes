@@ -18,7 +18,19 @@ export default function Dashboard({ patients, onOpenPatient, onNewPatient, onDel
   const [session, setSession] = useState(null);
   const [currentPlan, setCurrentPlan] = useState(localStorage.getItem('obsmed-plan') || null);
   
-  const avatarUrl = localStorage.getItem('obsmed-avatar') || '';
+    const [avatarUrl, setAvatarUrl] = useState(() => localStorage.getItem('obsmed-avatar') || '');
+
+  useEffect(() => {
+    const handleProfileUpdate = () => {
+      setAvatarUrl(localStorage.getItem('obsmed-avatar') || '');
+    };
+    window.addEventListener('profileUpdated', handleProfileUpdate);
+    window.addEventListener('storage', handleProfileUpdate);
+    return () => {
+      window.removeEventListener('profileUpdated', handleProfileUpdate);
+      window.removeEventListener('storage', handleProfileUpdate);
+    };
+  }, []);
 
   const handlePlanChange = (plan) => {
     if (plan) {

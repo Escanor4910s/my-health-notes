@@ -73,12 +73,16 @@ export async function loadUserProfile(userId) {
       if (profileData.ai_name) localStorage.setItem('obsmed-ai-name', profileData.ai_name);
       if (profileData.pin_hash) localStorage.setItem('obsmed-pin', profileData.pin_hash);
       
+      
       if (profileData.custom_catalogs) {
         if (profileData.custom_catalogs.symptom_types) localStorage.setItem('obsmed_custom_symptom_types', JSON.stringify(profileData.custom_catalogs.symptom_types));
         if (profileData.custom_catalogs.symptom_fields) localStorage.setItem('obsmed_custom_symptom_fields', JSON.stringify(profileData.custom_catalogs.symptom_fields));
         if (profileData.custom_catalogs.antecedents) localStorage.setItem('obsmed-antecedents-catalog', JSON.stringify(profileData.custom_catalogs.antecedents));
       }
-    }
+      
+      // DECLENCHE LA REACTIVITE DU DASHBOARD
+      window.dispatchEvent(new Event('profileUpdated'));
+
     return profileData;
   } catch (err) {
     console.error('Erreur lors du chargement du profil:', err);
