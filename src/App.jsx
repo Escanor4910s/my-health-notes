@@ -404,6 +404,35 @@ function AppContent() {
   const [showVersionHistory, setShowVersionHistory] = useState(false);
 
   useEffect(() => {
+    if (session?.user?.id) {
+      import('./lib/profile.js').then(({ loadUserProfile }) => {
+        loadUserProfile(session.user.id).then((profile) => {
+          if (profile) {
+            if (profile.theme) {
+              setDarkMode(profile.theme === 'dark');
+            }
+            if (profile.bg_theme) setBgTheme(profile.bg_theme);
+            if (profile.accent_theme) setAccentTheme(profile.accent_theme);
+          }
+        });
+      });
+    }
+  }, [session]);
+
+  useEffect(() => {
+    if (session?.user?.id) {
+      import('./lib/profile.js').then(({ updateProfileSettings }) => {
+        updateProfileSettings(session.user.id, {
+          theme: darkMode ? 'dark' : 'light',
+          accent_theme: accentTheme,
+          bg_theme: bgTheme
+        });
+      });
+    }
+  }, [darkMode, accentTheme, bgTheme, session]);
+
+
+  useEffect(() => {
     if (appMode !== 'editor' || !currentPatientId) return;
     setIsSaving(true);
     const timeout = setTimeout(() => {
@@ -755,35 +784,6 @@ function AppContent() {
     reader.readAsText(file);
     e.target.value = null;
   };
-
-
-  useEffect(() => {
-    if (session?.user?.id) {
-      import('./lib/profile').then(({ loadUserProfile }) => {
-        loadUserProfile(session.user.id).then((profile) => {
-          if (profile) {
-            if (profile.theme) {
-              setDarkMode(profile.theme === 'dark');
-            }
-            if (profile.bg_theme) setBgTheme(profile.bg_theme);
-            if (profile.accent_theme) setAccentTheme(profile.accent_theme);
-          }
-        });
-      });
-    }
-  }, [session]);
-
-  useEffect(() => {
-    if (session?.user?.id) {
-      import('./lib/profile').then(({ updateProfileSettings }) => {
-        updateProfileSettings(session.user.id, {
-          theme: darkMode ? 'dark' : 'light',
-          accent_theme: accentTheme,
-          bg_theme: bgTheme
-        });
-      });
-    }
-  }, [darkMode, accentTheme, bgTheme, session]);
 
   if (appMode === 'dashboard') {
     return (
