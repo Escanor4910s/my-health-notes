@@ -82,6 +82,7 @@ export async function loadUserProfile(userId) {
       
       // DECLENCHE LA REACTIVITE DU DASHBOARD
       window.dispatchEvent(new Event('profileUpdated'));
+    }
 
     return profileData;
   } catch (err) {
