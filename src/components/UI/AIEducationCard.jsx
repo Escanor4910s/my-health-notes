@@ -86,8 +86,8 @@ export default function AIEducationCard() {
       
       {/* HEADER GLOBALE */}
       <header className="section-header" style={{ marginBottom: '3rem', display: 'flex', alignItems: 'center', gap: '1.25rem', borderBottom: '1px solid var(--surface-border)', paddingBottom: '1.5rem' }}>
-        <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 20px rgba(0,0,0,0.08)', overflow: 'hidden', border: '1px solid var(--surface-border)' }}>
-          <img src={Logo8G} alt="8G" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+        <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: 'var(--surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 20px rgba(0,0,0,0.08)', overflow: 'hidden', border: '1px solid var(--surface-border)' }}>
+          <img src={Logo8G} alt="Assistant" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
         </div>
         <div>
           <h2 style={{ margin: 0, fontSize: '1.75rem' }}>Personnaliser l'IA</h2>
@@ -110,7 +110,7 @@ export default function AIEducationCard() {
               type="text"
               value={aiName}
               onChange={(e) => setAiName(e.target.value)}
-              placeholder="Nom de l'assistant (ex: Copilote 8G)"
+              placeholder="Nom de l'assistant (ex: Mon Assistant Médical)"
               style={{
                 flex: 1, padding: '1.25rem 1.5rem', borderRadius: '16px', border: '1px solid var(--surface-border)',
                 background: 'var(--surface-bg)', color: 'var(--text-main)', fontSize: '1.1rem', outline: 'none', transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)'

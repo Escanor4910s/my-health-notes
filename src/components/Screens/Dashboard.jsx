@@ -1,16 +1,17 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Plus, Clock, Search, Folder, User, LogOut, Settings, Camera, CreditCard, X, Edit3, Image as ImageIcon, Check, Loader2, Save, Database, FileText, File, Trash2, TrendingUp, ChevronRight, ChevronLeft, Crown, Shield, Filter, SortAsc, BarChart3, Calendar, ChevronDown } from 'lucide-react';
+import { Plus, Clock, Search, Folder, User, LogOut, Settings, Camera, CreditCard, X, Edit3, Image as ImageIcon, Check, Loader2, Save, Database, FileText, File, Trash2, TrendingUp, ChevronRight, ChevronLeft, Crown, Shield, Filter, SortAsc, BarChart3, Calendar, ChevronDown, Download } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useNotification } from '../UI/NotificationSystem';
 import StatsPanel from './StatsPanel';
-
 import AccountModal, { AvatarWithBadge } from './AccountModal';
-export default function Dashboard({ patients, onOpenPatient, onNewPatient, onDeletePatient }) {
+
+export default function Dashboard({ patients, onOpenPatient, onNewPatient, onDeletePatient, onRestorePatient, onDuplicatePatient, onExportPatient, onOpenSettings }) {
   const [search, setSearch] = useState('');
   const [dateFilter, setDateFilter] = useState('all');
   const [completionFilter, setCompletionFilter] = useState('all');
   const [sortBy, setSortBy] = useState('recent');
   const [showFilters, setShowFilters] = useState(false);
+  const [viewMode, setViewMode] = useState('active'); // 'active' | 'trash'
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false);
   const [isStatsOpen, setIsStatsOpen] = useState(false);
   const { confirmAction } = useNotification();
@@ -115,7 +116,7 @@ export default function Dashboard({ patients, onOpenPatient, onNewPatient, onDel
 
   return (
     <div style={{ 
-      background: 'linear-gradient(135deg, #f4f6f9 0%, #e2e8f0 100%)',
+      background: 'var(--bg-color)',
       minHeight: '100vh', 
       paddingBottom: '3rem',
       position: 'relative',
@@ -160,7 +161,7 @@ export default function Dashboard({ patients, onOpenPatient, onNewPatient, onDel
 
         /* The "Glass UI" Stat Panels with fine hover line */
         .glass-stat-panel {
-          background: #ffffff;
+          background: var(--surface);
           border-radius: 24px;
           padding: 2.25rem;
           position: relative;
@@ -223,7 +224,7 @@ export default function Dashboard({ patients, onOpenPatient, onNewPatient, onDel
           position: absolute;
           bottom: 0; left: 0; right: 0;
           height: 230px;
-          background: #f1f5f9;
+          background: var(--surface-bg);
           border-radius: 0 16px 16px 16px;
           box-shadow: inset 0 2px 4px rgba(255,255,255,1);
           border: 1px solid #e2e8f0;
@@ -234,7 +235,7 @@ export default function Dashboard({ patients, onOpenPatient, onNewPatient, onDel
           position: absolute;
           top: -16px; left: -1px;
           width: 40%; height: 18px;
-          background: #f1f5f9;
+          background: var(--surface-bg);
           border-radius: 12px 12px 0 0;
           border: 1px solid #e2e8f0;
           border-bottom: none;
@@ -245,7 +246,7 @@ export default function Dashboard({ patients, onOpenPatient, onNewPatient, onDel
           position: absolute;
           bottom: 12px; left: 12px; right: 12px;
           height: 205px;
-          background: #ffffff;
+          background: var(--surface);
           border-radius: 8px 8px 0 0;
           box-shadow: 0 -2px 10px rgba(0,0,0,0.03);
           border: 1px solid #f1f5f9;
@@ -264,7 +265,7 @@ export default function Dashboard({ patients, onOpenPatient, onNewPatient, onDel
           position: absolute;
           bottom: 0; left: 0; right: 0;
           height: 180px;
-          background: #ffffff;
+          background: var(--surface);
           border-radius: 0 12px 16px 16px;
           border: 1px solid #e2e8f0;
           box-shadow: 0 -2px 15px rgba(0,0,0,0.04);
@@ -284,7 +285,7 @@ export default function Dashboard({ patients, onOpenPatient, onNewPatient, onDel
 
         /* Elegant Date Pill */
         .folder-date-pro {
-          background: #f8fafc;
+          background: var(--surface-bg);
           border: 1px solid #f1f5f9;
           padding: 0.35rem 0.85rem;
           border-radius: 99px;
@@ -302,30 +303,41 @@ export default function Dashboard({ patients, onOpenPatient, onNewPatient, onDel
           border-color: var(--primary);
         }
 
-        /* The Delete Button - Minimalist */
-        .delete-action-btn {
+        /* The Folder Action Buttons - Minimalist */
+        .folder-actions-wrapper {
           position: absolute;
           bottom: 1rem; right: 1rem;
-          background: #fff;
+          display: flex; gap: 8px;
+          z-index: 20;
+          opacity: 0;
+          transform: translateY(10px);
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .pro-folder-card:hover .folder-actions-wrapper {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        .folder-action-btn {
+          background: var(--surface);
           border: 1px solid #e2e8f0;
           color: #94a3b8;
           border-radius: 50%;
           width: 36px; height: 36px;
           display: flex; align-items: center; justify-content: center;
-          transition: all 0.2s;
-          z-index: 20;
-          opacity: 0;
-          transform: translateY(10px);
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          cursor: pointer;
         }
-        .pro-folder-card:hover .delete-action-btn {
-          opacity: 1;
-          transform: translateY(0);
+        .folder-action-btn:hover {
+          color: #fff !important;
+          border-color: transparent !important;
+          transform: scale(1.15) translateY(-2px);
         }
-        .delete-action-btn:hover {
-          background: #ef4444;
-          color: #fff;
-          border-color: #ef4444;
-          transform: scale(1.1);
+        .folder-action-btn.delete-btn:hover,
+        .folder-action-btn.duplicate-btn:hover,
+        .folder-action-btn.export-btn:hover,
+        .folder-action-btn.restore-btn:hover {
+          background: linear-gradient(135deg, var(--primary), #ef4444) !important;
+          box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4) !important;
         }
 
         /* Smooth Search Input */
@@ -333,10 +345,10 @@ export default function Dashboard({ patients, onOpenPatient, onNewPatient, onDel
           width: 350px;
           padding: 0.85rem 1.25rem 0.85rem 3rem;
           border-radius: 99px;
-          background: #ffffff;
+          background: var(--surface);
           border: 1px solid #e2e8f0;
           font-size: 0.95rem;
-          color: #0f172a;
+          color: var(--text-main);
           outline: none;
           transition: all 0.3s;
           box-shadow: 0 2px 10px rgba(0,0,0,0.02);
@@ -393,7 +405,23 @@ export default function Dashboard({ patients, onOpenPatient, onNewPatient, onDel
               gap: 0.5rem !important;
             }
           }
-        `}} />
+        
+          @media (max-width: 768px) {
+            .folder-actions-wrapper {
+              opacity: 1 !important;
+              transform: translateY(0) !important;
+              background: rgba(255,255,255,0.7);
+              padding: 4px;
+              border-radius: 99px;
+              backdrop-filter: blur(4px);
+              box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            }
+            .folder-action-btn {
+              width: 44px !important;
+              height: 44px !important;
+            }
+          }
+    `}} />
 
       <div className="dashboard-watermark" />
 
@@ -404,13 +432,16 @@ export default function Dashboard({ patients, onOpenPatient, onNewPatient, onDel
           <img src="/logo.png" alt="ObsMed Logo" style={{ width: '38px', height: '38px', objectFit: 'contain' }} />
           <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', margin: 0, whiteSpace: 'nowrap' }}>
             <span className="brand-text" style={{ display: 'flex', alignItems: 'baseline' }}>
-              <span className="header-brand-name" style={{ fontFamily: "'Cabin Sketch', cursive", fontSize: '2rem', fontWeight: '700', color: '#0f172a', letterSpacing: '1px' }}>Obs</span>
+              <span className="header-brand-name" style={{ fontFamily: "'Cabin Sketch', cursive", fontSize: '2rem', fontWeight: '700', color: 'var(--text-main)', letterSpacing: '1px' }}>Obs</span>
               <span className="header-brand-name" style={{ fontFamily: "'Dancing Script', cursive", fontSize: '2.2rem', fontWeight: '700', color: 'var(--primary)', marginLeft: '4px' }}>Med</span>
             </span>
           </h1>
         </div>
         
         <div className="header-right-actions" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
+          
+          
+          
           <button 
             className="btn btn-nouveau-dossier" 
             onClick={onNewPatient} 
@@ -425,13 +456,14 @@ export default function Dashboard({ patients, onOpenPatient, onNewPatient, onDel
           >
             <Plus size={18} strokeWidth={2.5} /> <span>Nouveau Dossier</span>
           </button>
+
           
           <div 
             className="espace-personnel-btn"
             onClick={() => setIsAccountModalOpen(true)}
             style={{ 
               display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', 
-              padding: '0.35rem 1.25rem 0.35rem 0.35rem', borderRadius: '99px', background: '#f8fafc',
+              padding: '0.35rem 1.25rem 0.35rem 0.35rem', borderRadius: '99px', background: 'var(--surface-bg)',
               border: '1px solid #e2e8f0', transition: 'all 0.3s', flexShrink: 0
             }}
             onMouseOver={e => { e.currentTarget.style.borderColor = 'var(--primary)'; e.currentTarget.style.background = '#fff'; }}
@@ -454,11 +486,11 @@ export default function Dashboard({ patients, onOpenPatient, onNewPatient, onDel
               <p style={{ margin: '0 0 0.5rem 0', color: '#64748b', fontSize: '0.85rem', fontWeight: '700', letterSpacing: '1px', textTransform: 'uppercase' }}>
                 Total des Observations
               </p>
-              <h2 style={{ margin: 0, fontSize: '3.5rem', color: '#0f172a', lineHeight: '1', fontFamily: "'Space Grotesk', sans-serif", fontWeight: '800', letterSpacing: '-1px' }}>
+              <h2 style={{ margin: 0, fontSize: '3.5rem', color: 'var(--text-main)', lineHeight: '1', fontFamily: "'Space Grotesk', sans-serif", fontWeight: '800', letterSpacing: '-1px' }}>
                 {totalConsults}
               </h2>
             </div>
-            <div style={{ width: '70px', height: '70px', borderRadius: '20px', background: '#f8fafc', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #e2e8f0', transition: 'border-color 0.4s' }} className="stat-icon-wrapper">
+            <div style={{ width: '70px', height: '70px', borderRadius: '20px', background: 'var(--surface-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #e2e8f0', transition: 'border-color 0.4s' }} className="stat-icon-wrapper">
               <Database className="stat-icon" size={28} color="#94a3b8" strokeWidth={1.5} />
             </div>
           </div>
@@ -469,7 +501,7 @@ export default function Dashboard({ patients, onOpenPatient, onNewPatient, onDel
                 Dynamique Récente
               </p>
               <div style={{ display: 'flex', alignItems: 'flex-end', gap: '1rem' }}>
-                <h2 style={{ margin: 0, fontSize: '3.5rem', color: '#0f172a', lineHeight: '1', fontFamily: "'Space Grotesk', sans-serif", fontWeight: '800', letterSpacing: '-1px' }}>
+                <h2 style={{ margin: 0, fontSize: '3.5rem', color: 'var(--text-main)', lineHeight: '1', fontFamily: "'Space Grotesk', sans-serif", fontWeight: '800', letterSpacing: '-1px' }}>
                   {activeThisWeek}
                 </h2>
                 <span className="stat-icon" style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#64748b', fontWeight: '600', paddingBottom: '0.6rem', fontSize: '0.9rem' }}>
@@ -496,7 +528,7 @@ export default function Dashboard({ patients, onOpenPatient, onNewPatient, onDel
         {/* Title Area + Search + Filters */}
         <div style={{ marginBottom: '2.5rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-            <h2 style={{ margin: 0, fontSize: '1.8rem', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '1rem', fontWeight: '800', letterSpacing: '-0.5px' }}>
+            <h2 style={{ margin: 0, fontSize: '1.8rem', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '1rem', fontWeight: '800', letterSpacing: '-0.5px' }}>
               Explorateur Clinique
             </h2>
             
@@ -547,7 +579,7 @@ export default function Dashboard({ patients, onOpenPatient, onNewPatient, onDel
                 onClick={() => setIsStatsOpen(true)}
                 style={{
                   display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 1.25rem',
-                  background: '#fff', color: '#475569', border: '1px solid #e2e8f0',
+                  background: 'var(--surface)', color: '#475569', border: '1px solid #e2e8f0',
                   borderRadius: '14px', cursor: 'pointer', fontWeight: '600', fontSize: '0.9rem',
                   transition: 'all 0.3s', boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
                 }}
@@ -563,7 +595,7 @@ export default function Dashboard({ patients, onOpenPatient, onNewPatient, onDel
           {/* Filter Bar (collapsible) */}
           {showFilters && (
             <div className="animate-fade-in" style={{
-              background: '#fff', borderRadius: '18px', padding: '1.25rem 1.5rem',
+              background: 'var(--surface)', borderRadius: '18px', padding: '1.25rem 1.5rem',
               border: '1px solid #e2e8f0', boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
               display: 'flex', flexWrap: 'wrap', gap: '1.25rem', alignItems: 'center',
               marginBottom: '1rem',
@@ -572,7 +604,7 @@ export default function Dashboard({ patients, onOpenPatient, onNewPatient, onDel
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Calendar size={14} color="#94a3b8" />
                 <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Période</span>
-                <div style={{ display: 'flex', background: '#f1f5f9', borderRadius: '10px', padding: '3px', gap: '2px' }}>
+                <div style={{ display: 'flex', background: 'var(--surface-bg)', borderRadius: '10px', padding: '3px', gap: '2px' }}>
                   {[{v:'all',l:'Tout'},{v:'today',l:"Aujourd'hui"},{v:'week',l:'Semaine'},{v:'month',l:'Mois'}].map(f => (
                     <button key={f.v} onClick={() => setDateFilter(f.v)} style={{
                       padding: '0.4rem 0.85rem', borderRadius: '8px', border: 'none', cursor: 'pointer',
@@ -589,7 +621,7 @@ export default function Dashboard({ patients, onOpenPatient, onNewPatient, onDel
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Check size={14} color="#94a3b8" />
                 <span style={{ fontSize: '0.8rem', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>État</span>
-                <div style={{ display: 'flex', background: '#f1f5f9', borderRadius: '10px', padding: '3px', gap: '2px' }}>
+                <div style={{ display: 'flex', background: 'var(--surface-bg)', borderRadius: '10px', padding: '3px', gap: '2px' }}>
                   {[{v:'all',l:'Tous'},{v:'complete',l:'Complets'},{v:'inprogress',l:'En cours'},{v:'empty',l:'Vides'}].map(f => (
                     <button key={f.v} onClick={() => setCompletionFilter(f.v)} style={{
                       padding: '0.4rem 0.85rem', borderRadius: '8px', border: 'none', cursor: 'pointer',
@@ -607,7 +639,7 @@ export default function Dashboard({ patients, onOpenPatient, onNewPatient, onDel
                 <SortAsc size={14} color="#94a3b8" />
                 <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{
                   padding: '0.45rem 0.85rem', borderRadius: '10px', border: '1px solid #e2e8f0',
-                  background: '#fff', color: '#475569', fontWeight: '600', fontSize: '0.85rem',
+                  background: 'var(--surface)', color: '#475569', fontWeight: '600', fontSize: '0.85rem',
                   cursor: 'pointer', outline: 'none',
                 }}>
                   <option value="recent">Plus récent</option>
@@ -642,12 +674,27 @@ export default function Dashboard({ patients, onOpenPatient, onNewPatient, onDel
         {/* MASTERPIECE FOLDERS GRID / EMPTY STATE */}
         {filteredPatients.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '5rem 2rem', background: 'rgba(255,255,255,0.4)', backdropFilter: 'blur(10px)', borderRadius: '24px', border: '1px dashed #cbd5e1' }}>
-            <Folder size={64} color="#94a3b8" strokeWidth={1} style={{ marginBottom: '1.5rem', opacity: 0.8 }} />
-            <h3 style={{ margin: '0 0 1rem 0', color: '#0f172a', fontSize: '1.5rem', fontWeight: '800' }}>Aucun dossier trouvé</h3>
-            <p style={{ color: '#64748b', fontSize: '1rem', marginBottom: '2rem', maxWidth: '400px', margin: '0 auto 2rem auto' }}>Commencez par créer votre première observation médicale ou modifiez vos critères de recherche.</p>
-            <button className="btn btn-primary" onClick={onNewPatient} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.75rem', padding: '0.85rem 2rem', borderRadius: '99px', fontWeight: '600', boxShadow: '0 8px 25px rgba(var(--primary-rgb, 200,0,0), 0.25)' }}>
-              <Plus size={18} /> Créer un nouveau dossier
-            </button>
+            {viewMode === 'trash' ? (
+              <Trash2 size={64} color="#ef4444" strokeWidth={1} style={{ marginBottom: '1.5rem', opacity: 0.5 }} />
+            ) : (
+              <Folder size={64} color="#94a3b8" strokeWidth={1} style={{ marginBottom: '1.5rem', opacity: 0.8 }} />
+            )}
+            
+            <h3 style={{ margin: '0 0 1rem 0', color: 'var(--text-main)', fontSize: '1.5rem', fontWeight: '800' }}>
+              {viewMode === 'trash' ? 'Corbeille vide' : 'Aucun dossier trouvé'}
+            </h3>
+            
+            <p style={{ color: '#64748b', fontSize: '1rem', marginBottom: '2rem', maxWidth: '400px', margin: '0 auto 2rem auto' }}>
+              {viewMode === 'trash' 
+                ? "Il n'y a aucun élément dans la corbeille. Les dossiers que vous supprimez apparaîtront ici." 
+                : "Commencez par créer votre première observation médicale ou modifiez vos critères de recherche."}
+            </p>
+            
+            {viewMode === 'active' && (
+              <button className="btn btn-primary" onClick={onNewPatient} style={{ display: 'inline-flex', alignItems: 'center', gap: '0.75rem', padding: '0.85rem 2rem', borderRadius: '99px', fontWeight: '600', boxShadow: '0 8px 25px rgba(var(--primary-rgb, 200,0,0), 0.25)' }}>
+                <Plus size={18} /> Créer un nouveau dossier
+              </button>
+            )}
           </div>
         ) : (
           <div className="folders-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))', gap: '3rem 2.5rem' }}>
@@ -662,10 +709,10 @@ export default function Dashboard({ patients, onOpenPatient, onNewPatient, onDel
                 <div className="folder-paper-pro">
                   {hasData ? (
                     <>
-                      <div style={{ width: '100%', height: '6px', background: '#f1f5f9', borderRadius: '3px', marginBottom: '14px' }}></div>
-                      <div style={{ width: '85%', height: '6px', background: '#f1f5f9', borderRadius: '3px', marginBottom: '14px' }}></div>
-                      <div style={{ width: '90%', height: '6px', background: '#f1f5f9', borderRadius: '3px', marginBottom: '14px' }}></div>
-                      <div style={{ width: '40%', height: '6px', background: '#f1f5f9', borderRadius: '3px' }}></div>
+                      <div style={{ width: '100%', height: '6px', background: 'var(--surface-bg)', borderRadius: '3px', marginBottom: '14px' }}></div>
+                      <div style={{ width: '85%', height: '6px', background: 'var(--surface-bg)', borderRadius: '3px', marginBottom: '14px' }}></div>
+                      <div style={{ width: '90%', height: '6px', background: 'var(--surface-bg)', borderRadius: '3px', marginBottom: '14px' }}></div>
+                      <div style={{ width: '40%', height: '6px', background: 'var(--surface-bg)', borderRadius: '3px' }}></div>
                       <div style={{ marginTop: 'auto', alignSelf: 'flex-end', display: 'flex', alignItems: 'center', gap: '4px', color: '#cbd5e1', fontSize: '0.7rem', fontWeight: '600' }}>
                         <FileText size={16} strokeWidth={2} /> DONNÉES
                       </div>
@@ -686,7 +733,7 @@ export default function Dashboard({ patients, onOpenPatient, onNewPatient, onDel
                     </span>
                   </div>
                   
-                  <h3 style={{ margin: '0 0 0.5rem 0', color: '#0f172a', fontSize: '1.15rem', fontWeight: '800', lineHeight: '1.3', letterSpacing: '-0.3px' }}>
+                  <h3 style={{ margin: '0 0 0.5rem 0', color: 'var(--text-main)', fontSize: '1.15rem', fontWeight: '800', lineHeight: '1.3', letterSpacing: '-0.3px' }}>
                     {p.data?.['etat-civil']?.nom_prenoms || 'Patient Anonyme'}
                   </h3>
                   
@@ -698,8 +745,55 @@ export default function Dashboard({ patients, onOpenPatient, onNewPatient, onDel
 
                   <div style={{ marginTop: 'auto', alignSelf: 'flex-end', color: 'var(--primary)', opacity: 0, transition: 'all 0.3s', transform: 'translateX(-10px)' }} className="folder-chevron">
                     <ChevronRight size={20} strokeWidth={2.5} />
+                    </div>
+
+                    {/* ACTIONS WRAPPER (Accessible, Bottom Right) */}
+                    <div className="folder-actions-wrapper">
+                      {viewMode === 'active' && onExportPatient && (
+                        <button 
+                          className="folder-action-btn export-btn"
+                          title="Exporter le dossier (.obsmed)"
+                          onClick={(e) => { e.stopPropagation(); onExportPatient(p); }}
+                        >
+                          <Download size={16} strokeWidth={2.5} />
+                        </button>
+                      )}
+
+                      {viewMode === 'active' && onDuplicatePatient && (
+                        <button 
+                          className="folder-action-btn duplicate-btn"
+                          title="Dupliquer le dossier"
+                          onClick={(e) => { e.stopPropagation(); onDuplicatePatient(p); }}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        </button>
+                      )}
+
+                      {viewMode === 'trash' && (
+                        <button 
+                          className="folder-action-btn restore-btn"
+                          title="Restaurer le dossier"
+                          onClick={(e) => { e.stopPropagation(); if (onRestorePatient) onRestorePatient(p); }}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                        </button>
+                      )}
+
+                      <button 
+                        className="folder-action-btn delete-btn"
+                        title={viewMode === 'trash' ? "Supprimer définitivement" : "Mettre à la corbeille"}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          confirmAction({
+                            message: viewMode === 'trash' ? 'Voulez-vous vraiment supprimer ce dossier DÉFINITIVEMENT ?' : 'Mettre ce dossier à la corbeille ?',
+                            onConfirm: () => onDeletePatient(p.patient_id_local || p.id)
+                          });
+                        }}
+                      >
+                        <Trash2 size={16} strokeWidth={2.5} />
+                      </button>
+                    </div>
                   </div>
-                </div>
 
                 {/* Delete Button */}
                 <button 

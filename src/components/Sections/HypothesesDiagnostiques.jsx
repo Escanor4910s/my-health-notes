@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { PremiumInput, PremiumTextArea } from '../Form/PremiumInput';
 import { Trash2 } from 'lucide-react';
+import AIInlineButton from '../UI/AIInlineButton';
+import { compactDossier } from '../../lib/ai';
+import { getAIName } from '../../lib/aiName';
 
-function HypothesesDiagnostiques({ data, updateData }) {
+function HypothesesDiagnostiques({ data, updateData, fullFormData }) {
   const [hypotheses, setHypotheses] = useState(data?.hypotheses || [{ id: Date.now() }]);
 
   const updateHypothesis = (index, field, value) => {
@@ -29,12 +32,36 @@ function HypothesesDiagnostiques({ data, updateData }) {
     });
   };
 
+  const handleAIResult = (result) => {
+    if (result && result.hypotheses && Array.isArray(result.hypotheses)) {
+      setHypotheses(prev => {
+        // Keep existing ones that have a name, add new ones
+        const existing = prev.filter(h => h.nom && h.nom.trim() !== '');
+        const newH = result.hypotheses.map(h => ({ ...h, id: Date.now() + Math.random() }));
+        const combined = [...existing, ...newH];
+        const finalArr = combined.length > 0 ? combined : [{ id: Date.now() }];
+        if (updateData) updateData({ hypotheses: finalArr });
+        return finalArr;
+      });
+    }
+  };
+
   return (
     <div className="glass-panel animate-fade-in" style={{ padding: '2rem' }}>
-      <h2 className="section-header" style={{ marginBottom: '0.5rem' }}>Hypothèses Diagnostiques</h2>
-      <p style={{ color: 'var(--text-light)', marginBottom: '2rem', fontSize: '0.95rem' }}>
-        Listez vos hypothèses diagnostiques du moins probable au plus probable, avec les arguments pour et contre.
-      </p>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem', marginBottom: '0.5rem' }}>
+        <div>
+          <h2 className="section-header" style={{ marginBottom: '0.5rem' }}>Hypothèses Diagnostiques</h2>
+          <p style={{ color: 'var(--text-light)', marginBottom: '2rem', fontSize: '0.95rem' }}>
+            Listez vos hypothèses diagnostiques du moins probable au plus probable, avec les arguments pour et contre.
+          </p>
+        </div>
+        <AIInlineButton 
+          label={`Suggérer des hypothèses avec ${getAIName()}`}
+          action="hypotheses"
+          payloadBuilder={() => ({ dossier: compactDossier(fullFormData) })}
+          onResult={handleAIResult}
+        />
+      </div>
 
       {hypotheses.map((hypothesis, index) => (
         <div

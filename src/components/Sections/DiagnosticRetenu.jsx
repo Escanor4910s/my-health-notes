@@ -2,8 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { ChevronDown, ChevronRight, Plus, Trash2, ShieldAlert } from 'lucide-react';
 import { PremiumInput, PremiumTextArea } from '../Form/PremiumInput';
 import { PremiumCheckbox } from '../Form/PremiumCheckbox';
+import AIInlineButton from '../UI/AIInlineButton';
+import { compactDossier } from '../../lib/ai';
+import { getAIName } from '../../lib/aiName';
 
-function DiagnosticRetenu({ data, updateData }) {
+function DiagnosticRetenu({ data, updateData, fullFormData }) {
   const [open, setOpen] = useState({ retenus: true, etio: false, diff: false, topo: false });
   const [diffDiagnostics, setDiffDiagnostics] = useState(data?.diffDiagnostics || [{ id: 1, nom: '', arguments: '' }]);
   
@@ -33,19 +36,44 @@ function DiagnosticRetenu({ data, updateData }) {
     updateData({ diffDiagnostics: newArr });
   };
 
-  const AccordionHeader = ({ label, sectionKey }) => (
-    <button onClick={() => toggle(sectionKey)} style={{
-      display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%',
-      padding: '0.9rem 1.2rem', borderRadius: '12px',
-      background: open[sectionKey] ? 'rgba(139,111,71,0.08)' : 'var(--beige-light)',
-      border: '1.5px solid ' + (open[sectionKey] ? 'var(--surface-border)' : 'transparent'),
-      cursor: 'pointer', marginBottom: open[sectionKey] ? '1rem' : '0.5rem',
-      fontSize: '0.95rem', fontWeight: '600', fontFamily: 'var(--font-body)',
-      color: 'var(--text-main)', transition: 'all 0.2s ease',
-    }}>
-      <span>{label}</span>
-      {open[sectionKey] ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-    </button>
+  const handleAIResult = (result) => {
+    if (result && typeof result === 'object') {
+      const updates = {};
+      if (result.diagnostic_retenu) updates.diagnostic_retenu = result.diagnostic_retenu;
+      if (result.arguments_diagnostic) updates.arguments_diagnostic = result.arguments_diagnostic;
+      if (result.diagnostic_etio) updates.diagnostic_etio = result.diagnostic_etio;
+      if (Object.keys(updates).length > 0) {
+        updateData(updates);
+      }
+    }
+  };
+
+  const AccordionHeader = ({ label, sectionKey, showAI }) => (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', width: '100%', marginBottom: open[sectionKey] ? '1rem' : '0.5rem' }}>
+      <button onClick={() => toggle(sectionKey)} style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: 1,
+        padding: '0.9rem 1.2rem', borderRadius: '12px',
+        background: open[sectionKey] ? 'rgba(139,111,71,0.08)' : 'var(--beige-light)',
+        border: '1.5px solid ' + (open[sectionKey] ? 'var(--surface-border)' : 'transparent'),
+        cursor: 'pointer',
+        fontSize: '0.95rem', fontWeight: '600', fontFamily: 'var(--font-body)',
+        color: 'var(--text-main)', transition: 'all 0.2s ease',
+      }}>
+        <span>{label}</span>
+        {open[sectionKey] ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+      </button>
+      {showAI && (
+        <AIInlineButton 
+          label={`Auto-complétion ${getAIName()}`}
+          action="chat"
+          payloadBuilder={() => ({ 
+            dossier: compactDossier(fullFormData), 
+            texte: "En te basant sur le dossier médical complet, donne-moi une auto-complétion du diagnostic retenu en JSON STRICT: {\"diagnostic_retenu\": \"...\", \"arguments_diagnostic\": \"...\", \"diagnostic_etio\": \"...\"}. N'inclus aucun texte avant ou après le JSON."
+          })}
+          onResult={handleAIResult}
+        />
+      )}
+    </div>
   );
 
   return (
@@ -53,9 +81,9 @@ function DiagnosticRetenu({ data, updateData }) {
       <header className="section-header"><h2>Diagnostics</h2></header>
 
       {/* 1. Diagnostics Retenus */}
-      <AccordionHeader label="Diagnostics Retenus" sectionKey="retenus" />
+      <AccordionHeader label="Diagnostics Retenus" sectionKey="retenus" showAI={true} />
       {open.retenus && <div style={{ marginBottom: '1.5rem' }}>
-        <PremiumTextArea id="diagnostics_retenus" label="Diagnostic(s) retenu(s)" placeholder="Le(s) diagnostic(s) final(s) après confrontation clinico-paraclinique..." value={data?.diagnostics_retenus || ''} onChange={handleChange} rows={4} />
+        <PremiumTextArea id="diagnostic_retenu" label="Diagnostic(s) retenu(s)" placeholder="Le(s) diagnostic(s) final(s) après confrontation clinico-paraclinique..." value={data?.diagnostic_retenu || ''} onChange={handleChange} rows={4} />
         <PremiumTextArea id="arguments_diagnostic" label="Arguments en faveur" placeholder="Arguments cliniques et paracliniques..." value={data?.arguments_diagnostic || ''} onChange={handleChange} rows={4} />
       </div>}
 

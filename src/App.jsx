@@ -6,16 +6,20 @@ import {
   Lightbulb, FlaskConical, Target, Pill, CheckCircle, Eye,
   PanelLeftClose, PanelLeftOpen, Menu, Sun, Moon,
   ChevronLeft, ArrowRight, Check, HelpCircle, Settings, Ear, Lock,
-  LayoutDashboard, LogOut, TrendingUp, History
+  LayoutDashboard, LogOut, TrendingUp, History, Maximize, Minimize
 } from 'lucide-react';
 import './index.css';
 
 import OnboardingTutorial from './components/UI/OnboardingTutorial';
-import Dashboard from './components/Screens/Dashboard';
-import AuthScreen from './components/Screens/AuthScreen';
+const Dashboard = lazy(() => import('./components/Screens/Dashboard'));
+const AuthScreen = lazy(() => import('./components/Screens/AuthScreen'));
 import { supabase } from './lib/supabase';
-import LockScreen from './components/Screens/LockScreen';
-import { NotificationProvider } from './components/UI/NotificationSystem';
+const LockScreen = lazy(() => import('./components/Screens/LockScreen'));
+const SettingsScreen = lazy(() => import('./components/Screens/SettingsScreen'));
+const PresentationMode = lazy(() => import('./components/Screens/PresentationMode'));
+import { NotificationProvider, useNotification } from './components/UI/NotificationSystem';
+import { useShortcuts } from './hooks/useShortcuts';
+import { t } from './lib/i18n';
 const TemplateSelector = lazy(() => import('./components/UI/TemplateSelector'));
 const VersionHistory = lazy(() => import('./components/UI/VersionHistory'));
 const AIAssistant = lazy(() => import('./components/UI/AIAssistant'));
@@ -309,8 +313,10 @@ const MobileDashboardButton = ({ onGoDashboard }) => {
 };
 
 function AppContent() {
+  const { notify } = useNotification();
   const [session, setSession] = useState(null);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem('obsmed-theme') === 'dark');
   const [appMode, setAppMode] = useState(() => {
     return localStorage.getItem('obsmed-pin') ? 'locked' : 'dashboard';
   });
@@ -364,6 +370,7 @@ function AppContent() {
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('obsmed-dark') === 'true');
   const [showSplash, setShowSplash] = useState(() => localStorage.getItem('obsmed-splash-seen') !== 'true');
   const [splashExiting, setSplashExiting] = useState(false);
+  const [isZenMode, setIsZenMode] = useState(false);
   const [saveTime, setSaveTime] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState(() => {
@@ -545,6 +552,15 @@ function AppContent() {
   const prevSection = currentIndex > 0 ? activeSectionsListGlobal[currentIndex - 1] : null;
   const nextSection = currentIndex < activeSectionsListGlobal.length - 1 ? activeSectionsListGlobal[currentIndex + 1] : null;
 
+  // Raccourcis clavier (Editor Mode)
+  useShortcuts({
+    onNext: () => nextSection && navigateTo(nextSection.id),
+    onPrev: () => prevSection && navigateTo(prevSection.id),
+    onToggleZen: () => setIsZenMode(prev => !prev),
+    onSave: () => notify({ type: 'success', message: 'Dossier sauvegardé automatiquement.' }),
+    onCommandPalette: () => setIsCommandPaletteOpen(true)
+  });
+
   const renderActiveSection = () => {
     const props = (id) => ({ data: formData[id], updateData: getUpdater(id), patientSexe: formData['etat-civil']?.sexe });
     switch (activeSection) {
@@ -581,11 +597,13 @@ function AppContent() {
     const Icon = section.icon;
     const isActive = activeSection === section.id;
     const hasDot = sectionHasData(section.id);
+    const translatedTitle = t(`sidebar.${section.id.replace('-', '_')}`) || section.title;
+    
     return (
       <button
         className={`nav-item-btn ${isActive ? 'active' : ''}`}
         onClick={() => navigateTo(section.id)}
-        title={isSidebarCollapsed ? section.title : undefined}
+        title={isSidebarCollapsed ? translatedTitle : undefined}
         style={{
           display: 'flex', alignItems: 'center', gap: '0.75rem', width: '100%',
           padding: isSub ? '0.55rem 0.85rem 0.55rem 2.4rem' : '0.7rem 1rem',
@@ -597,7 +615,7 @@ function AppContent() {
         }}
       >
         <Icon size={isSub ? 14 : 17} strokeWidth={isActive ? 2.5 : 2} style={{ minWidth: '17px' }} />
-        <span className="nav-label">{section.title}</span>
+        <span className="nav-label">{translatedTitle}</span>
         {hasDot && !isActive && (
           <span style={{ position: 'absolute', right: '10px', width: '6px', height: '6px', borderRadius: '50%', background: 'var(--success)' }} className="nav-label" />
         )}
@@ -618,19 +636,32 @@ function AppContent() {
   };
 
   if (!session) {
-    return <AuthScreen />;
+    return <Suspense fallback={<div style={{height:'100vh', display:'flex', alignItems:'center', justifyContent:'center'}}>Chargement...</div>}><AuthScreen /></Suspense>;
   }
 
   if (appMode === 'locked') {
-    return <LockScreen onUnlock={() => setAppMode('dashboard')} />;
+    return <Suspense fallback={<div style={{height:'100vh', display:'flex', alignItems:'center', justifyContent:'center'}}>Chargement...</div>}><LockScreen onUnlock={() => setAppMode('dashboard')} /></Suspense>;
+  }
+
+  if (appMode === 'settings') {
+    return <Suspense fallback={<div style={{height:'100vh', display:'flex', alignItems:'center', justifyContent:'center'}}>Chargement...</div>}><SettingsScreen onBack={() => setAppMode('dashboard')} /></Suspense>;
   }
 
   const handleDeletePatient = async (id) => {
     try {
+      const patientToDelete = patients.find(p => p.patient_id_local === id || p.id === id);
+      if (patientToDelete) {
+        patientToDelete.deleted_at = new Date().toISOString();
+        const trash = JSON.parse(localStorage.getItem('obsmed-trash') || '[]');
+        trash.push(patientToDelete);
+        localStorage.setItem('obsmed-trash', JSON.stringify(trash));
+      }
+
       const { error } = await supabase.from('patients').delete().eq('patient_id_local', id);
-      if (error) throw error;
+      if (error) console.warn('Supabase delete error:', error);
+      
       setPatients(prev => {
-        const updated = prev.filter(p => p.id !== id);
+        const updated = prev.filter(p => p.patient_id_local !== id && p.id !== id);
         localStorage.setItem('obsmed-patients', JSON.stringify(updated));
         return updated;
       });
@@ -639,10 +670,111 @@ function AppContent() {
     }
   };
 
+  const handleRestorePatient = async (patient) => {
+    const restored = { ...patient };
+    delete restored.deleted_at;
+    
+    setPatients(prev => {
+      const updated = [...prev, restored];
+      localStorage.setItem('obsmed-patients', JSON.stringify(updated));
+      return updated;
+    });
+    
+    const trash = JSON.parse(localStorage.getItem('obsmed-trash') || '[]');
+    const updatedTrash = trash.filter(p => p.patient_id_local !== patient.patient_id_local && p.id !== patient.id);
+    localStorage.setItem('obsmed-trash', JSON.stringify(updatedTrash));
+    
+    try {
+      await supabase.from('patients').upsert({
+        patient_id_local: restored.patient_id_local,
+        data: restored.data,
+        completion: restored.completion,
+        updated_at: new Date().toISOString()
+      });
+    } catch(err) {}
+  };
+
+  const handleDuplicatePatient = async (patient) => {
+    const newPatient = {
+      ...patient,
+      id: crypto.randomUUID(),
+      patient_id_local: crypto.randomUUID(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      // Add a 'Duplicata' tag automatically? Let's not mutate data yet, but we can set a tag later
+    };
+    
+    setPatients(prev => {
+      const updated = [newPatient, ...prev];
+      localStorage.setItem('obsmed-patients', JSON.stringify(updated));
+      return updated;
+    });
+
+    try {
+      await supabase.from('patients').insert(newPatient);
+    } catch(err) {}
+  };
+
+  const handleExportPatient = (patient) => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(patient));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    const nomPatient = patient.data?.['etat-civil']?.nom_prenoms || 'anonyme';
+    downloadAnchorNode.setAttribute("download", `dossier_${nomPatient.replace(/\s+/g, '_')}.obsmed`);
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+  };
+
+  const handleImportPatient = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const importedPatient = JSON.parse(event.target.result);
+        importedPatient.id = crypto.randomUUID();
+        importedPatient.patient_id_local = crypto.randomUUID();
+        importedPatient.created_at = new Date().toISOString();
+        importedPatient.updated_at = new Date().toISOString();
+        
+        setPatients(prev => {
+          const updated = [importedPatient, ...prev];
+          localStorage.setItem('obsmed-patients', JSON.stringify(updated));
+          return updated;
+        });
+        
+        try {
+          supabase.from('patients').insert(importedPatient).then(() => {});
+        } catch(err) {}
+      } catch (err) {
+        alert("Erreur lors de l'importation du fichier.");
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = null;
+  };
+
   if (appMode === 'dashboard') {
     return (
       <>
-        <Dashboard patients={patients} onOpenPatient={handleOpenPatient} onNewPatient={handleNewPatient} onDeletePatient={handleDeletePatient} />
+        <input 
+          type="file" 
+          id="import-obsmed" 
+          accept=".obsmed,.json" 
+          style={{ display: 'none' }} 
+          onChange={handleImportPatient} 
+        />
+        <Dashboard 
+          patients={patients} 
+          onOpenPatient={handleOpenPatient} 
+          onNewPatient={handleNewPatient} 
+          onDeletePatient={handleDeletePatient} 
+          onRestorePatient={handleRestorePatient}
+          onDuplicatePatient={handleDuplicatePatient}
+          onExportPatient={handleExportPatient}
+          onOpenSettings={() => setAppMode('settings')} 
+        />
         {showTemplateSelector && (
           <Suspense fallback={null}>
             <TemplateSelector onSelect={handleTemplateSelect} onClose={() => setShowTemplateSelector(false)} />
@@ -673,12 +805,13 @@ function AppContent() {
         </div>
       )}
 
-      <div className="app-layout" style={{ display: 'flex', minHeight: '100vh' }}>
+      <div className={`app-layout ${isZenMode ? 'zen-mode' : ''}`} style={{ display: 'flex', minHeight: '100vh' }}>
         <div className={`mobile-overlay ${isMobileMenuOpen ? 'open' : ''}`} onClick={() => setIsMobileMenuOpen(false)} />
         <button className={`fab-menu ${showFloatingBtn && !isMobileMenuOpen ? 'visible' : ''}`} onClick={() => setIsMobileMenuOpen(true)}>
           <Menu size={20} />
         </button>
 
+        {!isZenMode && (
         <aside className={`app-sidebar ${isSidebarCollapsed ? 'collapsed' : ''} ${isMobileMenuOpen ? 'mobile-open' : ''}`} style={{ width: '280px', minWidth: '280px', padding: '1.5rem 1rem', display: 'flex', flexDirection: 'column', position: 'sticky', top: 0, height: '100vh', borderRight: '2px solid var(--surface-border)', background: 'var(--sidebar-bg)', overflowY: 'auto' }}>
           
           <div className="sidebar-brand" style={{ marginBottom: '1rem', paddingLeft: '0.75rem' }}>
@@ -691,7 +824,7 @@ function AppContent() {
             </h1>
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', width: '100%', padding: '0 0.25rem' }}>
+          <div style={{ display: 'flex', flexWrap: isSidebarCollapsed ? 'wrap' : 'nowrap', justifyContent: isSidebarCollapsed ? 'center' : 'space-between', alignItems: 'center', gap: isSidebarCollapsed ? '8px' : '0', marginBottom: '1.5rem', width: '100%', padding: '0 0.25rem' }}>
             <button 
               className="exit-folder-btn"
               onClick={() => { if (window.confirm('Êtes-vous sûr de vouloir quitter ce dossier et retourner à l\'accueil ?')) { setAppMode('dashboard'); } }} 
@@ -711,7 +844,7 @@ function AppContent() {
               {!isSidebarCollapsed && <span>Quitter</span>}
             </button>
 
-            <div style={{ display: 'flex', gap: '4px' }}>
+            <div style={{ display: 'flex', gap: '4px', flexWrap: isSidebarCollapsed ? 'wrap' : 'nowrap', justifyContent: 'center' }}>
               <button className="top-icon-btn theme-toggle" onClick={() => setShowVersionHistory(true)} title="Historique des versions"><History size={16} /></button>
               <button className="top-icon-btn theme-toggle" onClick={() => setForceTutorial(true)} title="Tutoriel de prise en main"><HelpCircle size={16} /></button>
               <button className="top-icon-btn theme-toggle" onClick={() => setDarkMode(!darkMode)} title={darkMode ? 'Mode clair' : 'Mode sombre'}>{darkMode ? <Sun size={16} /> : <Moon size={16} />}</button>
@@ -720,12 +853,12 @@ function AppContent() {
           </div>
 
           <nav className="nav-container" style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1px' }}>
-            <GroupLabel first>Interrogatoire</GroupLabel>
+            <GroupLabel first>{t('sidebar.group.interrogatoire')}</GroupLabel>
             {SECTIONS.map(s => <NavItem key={s.id} section={s} />)}
             
-            <GroupLabel>Examen Clinique</GroupLabel>
-            <button className="nav-item-btn" onClick={() => { if (isSidebarCollapsed) setIsSidebarCollapsed(false); setIsExamenOpen(!isExamenOpen); }} title={isSidebarCollapsed ? "Examen physique" : undefined} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: '0.7rem 1rem', borderRadius: '10px', background: isExamenOpen ? 'var(--brown-subtle)' : 'transparent', color: 'var(--text-main)', border: 'none', cursor: 'pointer', textAlign: 'left', fontSize: '0.94rem', fontWeight: '600', fontFamily: 'var(--font-body)', marginBottom: '2px', position: 'relative' }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><Stethoscope size={17} strokeWidth={2} style={{ minWidth: '17px' }} /><span className="nav-label">Examen physique</span></span>
+            <GroupLabel>{t('sidebar.group.examen')}</GroupLabel>
+            <button className="nav-item-btn" onClick={() => { if (isSidebarCollapsed) setIsSidebarCollapsed(false); setIsExamenOpen(!isExamenOpen); }} title={isSidebarCollapsed ? t('sidebar.examen_physique') : undefined} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: '0.7rem 1rem', borderRadius: '10px', background: isExamenOpen ? 'var(--brown-subtle)' : 'transparent', color: 'var(--text-main)', border: 'none', cursor: 'pointer', textAlign: 'left', fontSize: '0.94rem', fontWeight: '600', fontFamily: 'var(--font-body)', marginBottom: '2px', position: 'relative' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}><Stethoscope size={17} strokeWidth={2} style={{ minWidth: '17px' }} /><span className="nav-label">{t('sidebar.examen_physique')}</span></span>
               <span className="nav-chevron">{isExamenOpen ? <ChevronDown size={15} /> : <ChevronRight size={15} />}</span>
             </button>
             {isExamenOpen && !isSidebarCollapsed && (
@@ -734,12 +867,13 @@ function AppContent() {
               </div>
             )}
 
-            <GroupLabel>Synthèse & Conclusion</GroupLabel>
-            {POST_EXAMEN_SECTIONS.map(s => <NavItem key={s.id} section={s} />)}
-          </nav>
-        </aside>
+          <GroupLabel>{t('sidebar.group.synthese')}</GroupLabel>
+          {POST_EXAMEN_SECTIONS.map(s => <NavItem key={s.id} section={s} />)}
+        </nav>
+      </aside>
+      )}
 
-        <main className="app-main" style={{ flex: 1, padding: '2rem 3rem', display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '100vh', position: 'relative', zIndex: 1, overflow: 'hidden' }}>
+      <main className="app-main" style={{ flex: 1, padding: '2rem 3rem', display: 'flex', flexDirection: 'column', alignItems: 'center', minHeight: '100vh', position: 'relative', zIndex: 1, overflow: 'hidden' }}>
           <div className="app-main-watermark" />
           <OnboardingTutorial forceRun={forceTutorial} onComplete={() => setForceTutorial(false)} />
           <div style={{ width: '100%', maxWidth: '920px', overflow: 'hidden' }}>
@@ -809,6 +943,9 @@ function AppContent() {
               </div>
               
               <div className="top-actions-right" style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                <button className="btn" onClick={() => setIsZenMode(!isZenMode)} title="Mode Focus (Ctrl+Maj+F)" style={{ background: 'transparent', border: '1px solid var(--surface-border)', padding: '0.4rem', borderRadius: '8px', cursor: 'pointer', color: 'var(--text-light)' }}>
+                  {isZenMode ? <Minimize size={16} /> : <Maximize size={16} />}
+                </button>
                 <SyncManager session={session} />
                 
                 <div style={{ display: 'flex', justifyContent: 'flex-end' }}>

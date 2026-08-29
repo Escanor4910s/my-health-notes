@@ -12,23 +12,23 @@ export default defineConfig({
         name: 'Observation Médicale 2026',
         short_name: 'ObsMed 2026',
         description: 'Application de rédaction d\'observations médicales',
-        theme_color: '#9b7a5a',
-        background_color: '#f9f8f6',
+        theme_color: '#D4C7B1',
+        background_color: '#F0E8DA',
         display: 'standalone',
         icons: [
-          {
-            src: 'logo.svg',
-            sizes: '192x192',
-            type: 'image/svg+xml',
-            purpose: 'any maskable'
-          },
-          {
-            src: 'logo.svg',
-            sizes: '512x512',
-            type: 'image/svg+xml',
-            purpose: 'any maskable'
-          }
-        ]
+            {
+              src: 'icon-192.png',
+              sizes: '192x192',
+              type: 'image/png',
+              purpose: 'any maskable'
+            },
+            {
+              src: 'icon-512.png',
+              sizes: '512x512',
+              type: 'image/png',
+              purpose: 'any maskable'
+            }
+          ]
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2,ttf}']

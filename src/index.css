@@ -5,6 +5,10 @@
    3 couleurs complémentaires + neutres
    ═══════════════════════════════════════════════════════════ */
 :root {
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-header: linear-gradient(to right, rgba(255,255,255,0.9), rgba(255,255,255,0.4));
+  --glass-actions: rgba(255, 255, 255, 0.5);
+  --glass-border: rgba(255, 255, 255, 0.3);
   /* Couleur 1 — Marron chaud (primaire) */
   --brown:        #8B6914;
   --brown-light:  #A07D4E;
@@ -71,6 +75,56 @@
   --transition-fast: 0.2s var(--ease-out);
   --transition-slow: 0.4s var(--ease-out);
 }
+
+/* ----------------------------------------------------
+   DARK THEME (Warm Espresso / Sepia Dark)
+---------------------------------------------------- */
+[data-theme='dark'] {
+  --glass-bg: rgba(30, 26, 23, 0.85);
+  --glass-header: linear-gradient(to right, rgba(30,26,23,0.9), rgba(30,26,23,0.4));
+  --glass-actions: rgba(30, 26, 23, 0.5);
+  --glass-border: rgba(255, 255, 255, 0.05);
+  --brown:        #C7A35E; /* Brighter gold/brown for contrast */
+  --brown-light:  #D4B67A;
+  --brown-subtle: rgba(199, 163, 94, 0.15);
+
+  --beige:        #1A1714;
+  --beige-light:  #120F0D;
+  --beige-dark:   #1E1A17;
+
+  --noir:         #FBF8F3;
+  --noir-soft:    #E4D9C9;
+  --noir-muted:   #A49C94;
+
+  --blanc:        #24201C;
+  --blanc-warm:   #2A2521;
+
+  --primary:        var(--brown);
+  --primary-hover:  var(--brown-light);
+  --primary-dark:   #E2C48E;
+  --sidebar-bg:     var(--beige-dark);
+  --bg-color:       var(--beige-light);
+  --surface:        var(--blanc);
+  --surface-bg:     var(--blanc-warm);
+  --surface-hover:  rgba(199, 163, 94, 0.08);
+  --surface-color:  var(--text-main);
+  --surface-border: rgba(255, 255, 255, 0.08);
+  --text-main:      var(--noir);
+  --text-muted:     var(--noir-muted);
+  --text-light:     #7E7770;
+  
+  --success:        #6BA470;
+  --danger:         #D66B6B;
+}
+
+/* Global scrollbar for dark mode */
+[data-theme='dark'] ::-webkit-scrollbar-thumb {
+  background: #3A332C;
+}
+[data-theme='dark'] ::-webkit-scrollbar-track {
+  background: var(--bg-color);
+}
+
 
 /* ═══════════════════════════════════════════════════════════
    DARK MODE
@@ -832,8 +886,13 @@ select.input-field {
 
 .app-sidebar.collapsed nav button {
   justify-content: center;
+  padding-top: 0.35rem !important;
+  padding-bottom: 0.35rem !important;
   padding-left: 0 !important;
   padding-right: 0 !important;
+  width: 54px !important;
+  margin: 0 auto 4px auto !important;
+  border-radius: 12px !important;
 }
 
 .app-sidebar.collapsed .sidebar-brand {

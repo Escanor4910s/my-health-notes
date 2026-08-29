@@ -167,7 +167,7 @@ export default React.memo(function VersionHistory({ patientId, currentData, onRe
         .history-title {
           font-size: 1.25rem;
           font-weight: 600;
-          color: #0f172a;
+          color: var(--text-main);
           display: flex;
           align-items: center;
           gap: 12px;
@@ -186,7 +186,7 @@ export default React.memo(function VersionHistory({ patientId, currentData, onRe
         }
         .close-button:hover {
           background: rgba(148, 163, 184, 0.1);
-          color: #0f172a;
+          color: var(--text-main);
         }
         .history-content {
           flex: 1;
@@ -271,7 +271,7 @@ export default React.memo(function VersionHistory({ patientId, currentData, onRe
           font-size: 0.75rem;
           font-weight: 500;
           color: #475569;
-          background: #f1f5f9;
+          background: var(--surface-bg);
           padding: 4px 10px;
           border-radius: 12px;
           border: 1px solid #e2e8f0;
@@ -286,14 +286,14 @@ export default React.memo(function VersionHistory({ patientId, currentData, onRe
           background: white;
           border: 1px solid #e2e8f0;
           border-radius: 12px;
-          color: #0f172a;
+          color: var(--text-main);
           font-weight: 600;
           font-size: 0.875rem;
           cursor: pointer;
           transition: all 0.2s ease;
         }
         .restore-btn:hover {
-          background: #f8fafc;
+          background: var(--surface-bg);
           border-color: var(--primary, #3b82f6);
           color: var(--primary, #3b82f6);
         }
@@ -339,7 +339,7 @@ export default React.memo(function VersionHistory({ patientId, currentData, onRe
         .confirm-title {
           font-size: 1.125rem;
           font-weight: 600;
-          color: #0f172a;
+          color: var(--text-main);
           margin-bottom: 8px;
         }
         .confirm-text {
@@ -367,7 +367,7 @@ export default React.memo(function VersionHistory({ patientId, currentData, onRe
           color: #475569;
         }
         .btn-cancel:hover {
-          background: #f1f5f9;
+          background: var(--surface-bg);
         }
         .btn-confirm {
           background: var(--primary, #3b82f6);

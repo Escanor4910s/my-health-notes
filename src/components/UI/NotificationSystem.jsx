@@ -197,7 +197,7 @@ export const NotificationProvider = ({ children }) => {
         }
 
         .confirm-card {
-          background: #ffffff;
+          background: var(--surface);
           border-radius: 16px;
           padding: 24px;
           width: 100%;

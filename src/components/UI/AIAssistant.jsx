@@ -74,7 +74,7 @@ export default function AIAssistant({ formData, shouldPulse }) {
           box-shadow: 0 10px 25px -5px rgba(var(--primary-rgb, 0,0,0), 0.4), 0 8px 10px -6px rgba(var(--primary-rgb, 0,0,0), 0.2);
           transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
           padding: 0;
-          background: #fff;
+          background: var(--surface);
           display: flex; align-items: center; justify-content: center;
         }
         .widget-8g-btn:hover {
@@ -94,7 +94,7 @@ export default function AIAssistant({ formData, shouldPulse }) {
         }
         /* Base Layer: White Bg, Black Motif */
         .widget-layer-base {
-          background: #fff;
+          background: var(--surface);
           opacity: 1;
         }
         .widget-layer-base img {
@@ -166,10 +166,10 @@ export default function AIAssistant({ formData, shouldPulse }) {
           {/* Logo 1: 8G Mandala */}
           <div className="logo-switcher logo-1">
             <div className="widget-layer widget-layer-base">
-              <img src={Logo8G} alt="8G Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '6px' }} />
+              <img src={Logo8G} alt="Logo de l'assistant" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '6px' }} />
             </div>
             <div className="widget-layer widget-layer-hover">
-              <img src={Logo8G} alt="8G Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '6px' }} />
+              <img src={Logo8G} alt="Logo de l'assistant" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '6px' }} />
             </div>
           </div>
 
@@ -192,10 +192,10 @@ export default function AIAssistant({ formData, shouldPulse }) {
             position: 'fixed', bottom: '6.5rem', right: '2rem', zIndex: 60,
             width: 'min(450px, calc(100vw - 4rem))', height: 'min(75vh, 700px)',
             display: 'flex', flexDirection: 'column',
-            background: 'rgba(255, 255, 255, 0.85)',
+            background: 'var(--glass-bg)',
             backdropFilter: 'blur(24px) saturate(1.5)',
             WebkitBackdropFilter: 'blur(24px) saturate(1.5)',
-            border: '1px solid rgba(255, 255, 255, 0.3)',
+            border: '1px solid var(--glass-border)',
             borderRadius: '24px', 
             boxShadow: '0 30px 60px -15px rgba(0,0,0,0.1), 0 15px 25px -10px rgba(0,0,0,0.05)',
             overflow: 'hidden',
@@ -203,11 +203,11 @@ export default function AIAssistant({ formData, shouldPulse }) {
         >
           <div style={{ 
             padding: '1.2rem 1.5rem', 
-            background: 'linear-gradient(to right, rgba(255,255,255,0.9), rgba(255,255,255,0.4))',
+            background: 'var(--glass-header)',
             borderBottom: '1px solid var(--surface-border)', 
             display: 'flex', alignItems: 'center', gap: '0.75rem' 
           }}>
-            <div style={{ width: '36px', height: '36px', borderRadius: '12px', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 10px rgba(0,0,0,0.08)', overflow: 'hidden', border: '1px solid var(--surface-border)' }}>
+            <div style={{ width: '36px', height: '36px', borderRadius: '12px', background: 'var(--surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 10px rgba(0,0,0,0.08)', overflow: 'hidden', border: '1px solid var(--surface-border)' }}>
               <img src={Logo8G} alt="AI" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
             </div>
             <div style={{ flex: 1 }}>
@@ -230,7 +230,7 @@ export default function AIAssistant({ formData, shouldPulse }) {
           <div style={{ 
             padding: '1rem 1.5rem', 
             display: 'flex', flexWrap: 'wrap', gap: '0.5rem', 
-            background: 'rgba(255,255,255,0.5)',
+            background: 'var(--glass-actions)',
             borderBottom: '1px solid var(--surface-border)' 
           }}>
             {QUICK_ACTIONS.map(({ action, label, icon: Icon }) => (
@@ -279,7 +279,7 @@ export default function AIAssistant({ formData, shouldPulse }) {
                   </div>
                 ) : (
                   <div style={{ 
-                    background: '#fff', color: 'var(--text-main)',
+                    background: 'var(--surface)', color: 'var(--text-main)',
                     borderRadius: '20px 20px 20px 4px', padding: '1.2rem', 
                     maxWidth: '95%', fontSize: '0.9rem', lineHeight: '1.6',
                     boxShadow: '0 4px 20px rgba(0,0,0,0.06)', border: '1px solid var(--surface-border)'
@@ -300,7 +300,7 @@ export default function AIAssistant({ formData, shouldPulse }) {
               </div>
             ))}
             {loading && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--primary)', fontSize: '0.9rem', fontWeight: '600', background: '#fff', padding: '1rem 1.5rem', borderRadius: '20px', width: 'fit-content', boxShadow: '0 4px 15px rgba(0,0,0,0.05)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', color: 'var(--primary)', fontSize: '0.9rem', fontWeight: '600', background: 'var(--surface)', padding: '1rem 1.5rem', borderRadius: '20px', width: 'fit-content', boxShadow: '0 4px 15px rgba(0,0,0,0.05)' }}>
                 <Loader2 size={18} className="animate-spin" /> Analyse des données cliniques...
               </div>
             )}
@@ -308,7 +308,7 @@ export default function AIAssistant({ formData, shouldPulse }) {
             <div ref={endRef} />
           </div>
 
-          <form onSubmit={send} style={{ display: 'flex', gap: '0.75rem', padding: '1.25rem 1.5rem', background: '#fff', borderTop: '1px solid var(--surface-border)' }}>
+          <form onSubmit={send} style={{ display: 'flex', gap: '0.75rem', padding: '1.25rem 1.5rem', background: 'var(--surface)', borderTop: '1px solid var(--surface-border)' }}>
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}

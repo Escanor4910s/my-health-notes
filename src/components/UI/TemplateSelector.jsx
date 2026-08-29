@@ -8,10 +8,15 @@ import {
   CheckCircle2,
   Image as ImageIcon,
   File,
-  X
+  X,
+  Heart,
+  CheckCircle,
+  Brain,
+  Upload
 } from 'lucide-react';
 import logo8G from '../../assets/8G-logo.jpg';
 import { askAI, parseJSONResponse } from '../../lib/ai';
+import { getAIName } from '../../lib/aiName';
 
 export default function TemplateSelector({ onSelect, onClose }) {
   const [isVisible, setIsVisible] = useState(false);
@@ -82,7 +87,7 @@ export default function TemplateSelector({ onSelect, onClose }) {
       setProgressText('Extraction du texte...');
       const base64 = await toBase64(file);
       
-      setProgressText('Analyse clinique par 8G...');
+      setProgressText(`Analyse clinique par ${getAIName()}...`);
       
       // We pass it to askAI. Note: The edge function must support this.
       // If the edge function does not support it yet, it will throw, and we can catch and mock or show error.
@@ -158,7 +163,7 @@ export default function TemplateSelector({ onSelect, onClose }) {
         background-size: 400px;
         background-position: center;
         background-repeat: repeat;
-        mix-blend-mode: multiply; opacity: 0.015; /* 1.5% opacity as requested */
+        mix-blend-mode: multiply; opacity: 0.02; /* 2.0% opacity as requested */
         pointer-events: none;
       }
 
@@ -171,7 +176,7 @@ export default function TemplateSelector({ onSelect, onClose }) {
       
       .ts-title {
         font-family: var(--font-display);
-        font-size: 2.25rem; font-weight: 700; color: #1e293b;
+        font-size: 2.25rem; font-weight: 700; color: var(--text-main);
         letter-spacing: -0.02em; margin: 0 0 0.75rem 0;
       }
       
@@ -179,19 +184,29 @@ export default function TemplateSelector({ onSelect, onClose }) {
         font-size: 1.1rem; color: #64748b; font-weight: 400; margin: 0;
       }
 
-      .ts-close-btn {
-        position: absolute; right: 1.5rem; top: 1.5rem;
-        width: 44px; height: 44px; border-radius: 50%;
-        background: #f1f5f9; border: 1px solid rgba(0,0,0,0.05);
-        color: #64748b; display: flex; align-items: center; justify-content: center;
-        cursor: pointer; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        z-index: 20;
-      }
-      .ts-close-btn:hover {
-        background: var(--primary); color: #ffffff; border-color: var(--primary);
-        transform: translateY(-3px) scale(1.1) rotate(90deg);
-        box-shadow: 0 10px 20px -5px rgba(var(--primary-rgb, 200,0,0), 0.4);
-      }
+      .ts-close-btn, .ts-back-btn {
+          position: absolute; top: 1.5rem;
+          width: 44px; height: 44px; border-radius: 50%;
+          background: var(--surface-bg); border: 1px solid rgba(0,0,0,0.05);
+          color: #64748b; display: flex; align-items: center; justify-content: center;
+          cursor: pointer; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+          z-index: 20;
+        }
+        .ts-close-btn { right: 1.5rem; }
+        .ts-back-btn { left: 1.5rem; }
+
+        .ts-close-btn:hover {
+          background: linear-gradient(135deg, #ef4444, #dc2626);
+          color: #ffffff; border-color: transparent;
+          transform: translateY(-3px) scale(1.1) rotate(90deg);
+          box-shadow: 0 10px 20px -5px rgba(239, 68, 68, 0.5);
+        }
+        .ts-back-btn:hover {
+          background: linear-gradient(135deg, var(--primary), #8b5cf6); /* fallback gradient */
+          color: #ffffff; border-color: transparent;
+          transform: translateY(-3px) scale(1.1) translateX(-2px);
+          box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.2);
+        }
 
       /* Premium Choice Cards Container */
       .ts-cards-grid {
@@ -204,7 +219,7 @@ export default function TemplateSelector({ onSelect, onClose }) {
       .ts-card {
         flex: 1;
         position: relative; border-radius: 24px;
-        background: #ffffff;
+        background: var(--surface);
         border: 1px solid rgba(0,0,0,0.04);
         box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
         cursor: pointer; overflow: hidden;
@@ -247,12 +262,12 @@ export default function TemplateSelector({ onSelect, onClose }) {
       }
       
       .zero-icon-wrapper {
-        background: #f8fafc; border: 1px solid #e2e8f0;
+        background: var(--surface-bg); border: 1px solid #e2e8f0;
         box-shadow: inset 0 4px 10px rgba(0,0,0,0.03);
       }
       
       .ai-icon-wrapper {
-        background: #ffffff; border: 1px solid rgba(212, 175, 55, 0.3);
+        background: var(--surface); border: 1px solid rgba(212, 175, 55, 0.3);
         box-shadow: 0 0 30px rgba(212, 175, 55, 0.15), inset 0 4px 10px rgba(212, 175, 55, 0.05);
       }
 
@@ -277,7 +292,7 @@ export default function TemplateSelector({ onSelect, onClose }) {
         font-size: 1.5rem; font-weight: 700; margin: 0 0 0.75rem 0; letter-spacing: -0.02em;
         position: relative; z-index: 2;
       }
-      .ts-card-zero .ts-card-title { color: #1e293b; }
+      .ts-card-zero .ts-card-title { color: var(--text-main); }
       .ts-card-ai .ts-card-title {
         background: linear-gradient(135deg, var(--primary) 0%, #b45309 100%);
         -webkit-background-clip: text; -webkit-text-fill-color: transparent;
@@ -313,7 +328,7 @@ export default function TemplateSelector({ onSelect, onClose }) {
       /* Upload Button */
       .ts-upload-btn {
         margin-top: 2.5rem; 
-        background: #ffffff; 
+        background: var(--surface); 
         color: var(--primary); 
         border: 2px solid var(--primary); 
         padding: 0.85rem 2.5rem; 
@@ -348,10 +363,10 @@ export default function TemplateSelector({ onSelect, onClose }) {
           )}
           
           <h2 className="ts-title">
-            {mode === 'selection' ? 'Nouveau Dossier Médical' : 'Importation IA (8G)'}
+            {mode === 'selection' ? 'Nouveau Dossier M\u00E9dical' : 'Importation Assist\u00E9e'}
           </h2>
           <p className="ts-subtitle">
-            {mode === 'selection' ? 'Comment souhaitez-vous démarrer votre observation ?' : 'Glissez une ordonnance, des notes manuscrites ou des résultats biologiques.'}
+            {mode === 'selection' ? 'Comment souhaitez-vous d\u00E9marrer votre observation ?' : 'Glissez une ordonnance, des notes manuscrites ou des r\u00E9sultats biologiques.'}
           </p>
 
           <button onClick={handleClose} className="ts-close-btn" title="Fermer">
@@ -404,10 +419,43 @@ export default function TemplateSelector({ onSelect, onClose }) {
                 </div>
               </div>
               
-              <h3 className="ts-card-title">Construire avec 8G</h3>
-              <p className="ts-card-desc">L'IA déchiffre organiquement vos notes ou résultats pour pré-remplir le dossier.</p>
+              <h3 className="ts-card-title">Construire avec {getAIName()}</h3>
+              <p className="ts-card-desc">L'IA déchiffre organiquement vos notes ou r\u00E9sultats pour pré-remplir le dossier.</p>
+            </div>
+
+            {/* Card 3: Modèles de spécialité */}
+            <div className="ts-card ts-card-zero" onClick={() => setMode('specialty')}>
+              <div className="ts-card-hover-border" />
+              <div className="icon-wrapper" style={{ background: 'var(--surface-bg)', color: 'var(--primary)', border: '1px solid #e2e8f0' }}>
+                <Heart size={32} strokeWidth={2} />
+              </div>
+              <h3 className="ts-card-title">Modèles par spécialité</h3>
+              <p className="ts-card-desc">Utilisez un canevas pré-rempli (Cardiologie, Neurologie, etc.) pour gagner du temps.</p>
             </div>
             
+          </div>
+        )}
+
+        {/* Specialty Mode */}
+        {mode === 'specialty' && (
+          <div style={{ padding: '0 4rem 4rem 4rem', display: 'flex', flexDirection: 'column', gap: '1rem', flex: 1, overflowY: 'auto' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1.5rem' }}>
+              {[
+                { name: 'Cardiologie', icon: Heart, data: { 'examen-cardio': { texte: 'Bruits du cœur réguliers, bien frappés. Pas de souffle. Pouls périphériques perçus. Pas de signe d\'insuffisance cardiaque (pas d\'OMI, pas de TJ, RHJ négatif).' } } },
+                { name: 'Neurologie', icon: Brain, data: { 'examen-neuro': { texte: 'Conscient, orienté dans le temps et l\'espace. Paires crâniennes normales. Motricité et sensibilité conservées aux 4 membres. ROT présents et symétriques. RCP en flexion bilatéral.' } } },
+                { name: 'Général', icon: FileText, data: { 'examen-general': { etat_general: 'Bon', poids: '', taille: '', temperature: '37°C', ta_sys: '12', ta_dia: '8' } } }
+              ].map((spec, i) => (
+                <div key={i} onClick={() => {
+                  setIsVisible(false);
+                  setTimeout(() => onSelect({ defaultData: spec.data }), 400);
+                }} style={{ background: 'var(--surface)', padding: '1.5rem', borderRadius: '16px', border: '1px solid #e2e8f0', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', transition: 'transform 0.2s' }}
+                onMouseOver={e => e.currentTarget.style.transform = 'translateY(-4px)'}
+                onMouseOut={e => e.currentTarget.style.transform = 'translateY(0)'}>
+                  <spec.icon size={32} color="var(--primary)" />
+                  <span style={{ fontWeight: '700', color: '#334155' }}>{spec.name}</span>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
@@ -437,8 +485,8 @@ export default function TemplateSelector({ onSelect, onClose }) {
               />
               
               <UploadCloud size={64} color="var(--primary)" style={{ marginBottom: '1.5rem', transition: 'transform 0.3s', transform: dragActive ? 'scale(1.1)' : 'scale(1)' }} />
-              <h4 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', color: 'var(--primary)', margin: '0 0 0.5rem 0', fontWeight: '600' }}>Glissez-déposez votre document</h4>
-              <p style={{ color: '#64748b', margin: 0, fontSize: '1rem' }}>Images (JPG, PNG) ou PDF supportés.</p>
+              <h4 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', color: 'var(--primary)', margin: '0 0 0.5rem 0', fontWeight: '600' }}>Glissez-d\u00E9posez votre document</h4>
+              <p style={{ color: '#64748b', margin: 0, fontSize: '1rem' }}>Images (JPG, PNG) ou PDF support\u00E9s.</p>
               
               <button className="ts-upload-btn">
                 Parcourir les fichiers
@@ -465,7 +513,7 @@ export default function TemplateSelector({ onSelect, onClose }) {
               )}
             </div>
             
-            <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem', color: '#1e293b', margin: '0 0 1rem 0', fontWeight: '600' }}>{progressText}</h3>
+            <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem', color: 'var(--text-main)', margin: '0 0 1rem 0', fontWeight: '600' }}>{progressText}</h3>
             <p style={{ color: '#64748b', maxWidth: '400px', textAlign: 'center', fontSize: '1.05rem', lineHeight: 1.6 }}>
               Veuillez patienter pendant que l'intelligence artificielle structure vos informations cliniques.
             </p>

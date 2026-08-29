@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { PremiumCheckbox } from '../Form/PremiumCheckbox';
 import { PremiumInput, PremiumTextArea } from '../Form/PremiumInput';
-import { Trash2, Plus } from 'lucide-react';
+import { Trash2, Plus, AlertTriangle } from 'lucide-react';
+import { checkInteractions } from '../../lib/drugInteractions';
 
 const DynamicMedList = ({ title, meds, setMeds, detailsId, detailsValue, detailsLabel, detailsPlaceholder, handleChange }) => {
   const addMedicament = () => {
@@ -65,6 +66,7 @@ const TraitementSurveillance = ({ data, updateData }) => {
   const [medsEtiologique, setMedsEtiologique] = useState(data?.medsEtiologique || [{ id: 1, molecule: '', dose: '', posologie: '' }]);
   const [medsSymptomatique, setMedsSymptomatique] = useState(data?.medsSymptomatique || [{ id: 1, molecule: '', dose: '', posologie: '' }]);
   const [medsAdjuvant, setMedsAdjuvant] = useState(data?.medsAdjuvant || [{ id: 1, molecule: '', dose: '', posologie: '' }]);
+  const [interactions, setInteractions] = useState([]);
 
   const handleChange = (e) => {
     const { name, id, value, type, checked } = e.target;
@@ -80,6 +82,14 @@ const TraitementSurveillance = ({ data, updateData }) => {
       medsSymptomatique, 
       medsAdjuvant 
     });
+
+    const allMolecules = [
+      ...medsEtiologique.map(m => m.molecule),
+      ...medsSymptomatique.map(m => m.molecule),
+      ...medsAdjuvant.map(m => m.molecule)
+    ].filter(Boolean);
+    
+    setInteractions(checkInteractions(allMolecules));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [medsEtiologique, medsSymptomatique, medsAdjuvant]);
 
@@ -88,6 +98,22 @@ const TraitementSurveillance = ({ data, updateData }) => {
       <div className="section-header">
         <h2>Traitement et Surveillance</h2>
       </div>
+
+      {interactions.length > 0 && (
+        <div style={{ marginBottom: '2rem', padding: '1rem 1.25rem', backgroundColor: '#fef2f2', border: '1px solid #f87171', borderRadius: '12px', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#dc2626', fontWeight: 'bold' }}>
+            <AlertTriangle size={20} />
+            <span>Attention : Interactions médicamenteuses détectées</span>
+          </div>
+          <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            {interactions.map((int, idx) => (
+              <li key={idx} style={{ fontSize: '0.9rem', color: '#991b1b', background: '#fee2e2', padding: '0.5rem 0.75rem', borderRadius: '6px' }}>
+                <strong>{int.drug1} + {int.drug2} :</strong> {int.message}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <div style={{ marginBottom: '2.5rem' }}>
         <h4 style={{ marginBottom: '1.5rem', color: 'var(--primary)', borderBottom: '1px solid var(--surface-border)', paddingBottom: '0.5rem' }}>1. BUT DU TRAITEMENT</h4>

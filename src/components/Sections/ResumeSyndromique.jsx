@@ -1,15 +1,34 @@
 import React from 'react';
 import { PremiumTextArea } from '../Form/PremiumInput';
+import AIInlineButton from '../UI/AIInlineButton';
+import { compactDossier } from '../../lib/ai';
 
-function ResumeSyndromique({ data, updateData }) {
+import { getAIName } from '../../lib/aiName';
+
+function ResumeSyndromique({ data, updateData, fullFormData }) {
   const handleChange = (e) => {
     updateData({ [e.target.id]: e.target.value });
   };
 
+  const handleAIResult = (result) => {
+    if (result && typeof result === 'object') {
+      updateData({ 
+        resume: result.resume || data?.resume || '', 
+        probleme: result.probleme || data?.probleme || '' 
+      });
+    }
+  };
+
   return (
     <div className="animate-fade-in glass-panel" style={{ padding: '3rem' }}>
-      <header className="section-header">
+      <header className="section-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
         <h2>Résumé et Problème Posé</h2>
+        <AIInlineButton 
+          label={`Rédiger avec ${getAIName()}`}
+          action="synthese"
+          payloadBuilder={() => ({ dossier: compactDossier(fullFormData) })}
+          onResult={handleAIResult}
+        />
       </header>
       
       <div style={{ marginBottom: '1.5rem', color: 'var(--text-muted)' }}>
@@ -41,4 +60,3 @@ function ResumeSyndromique({ data, updateData }) {
 
 
 export default React.memo(ResumeSyndromique);
-

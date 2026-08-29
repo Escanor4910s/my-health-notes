@@ -176,7 +176,7 @@ const SyncManager = ({ session }) => {
           display: flex;
           align-items: center;
           gap: 0.75rem;
-          color: #0f172a;
+          color: var(--text-main);
           font-weight: 500;
           animation: slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1);
           z-index: 50;

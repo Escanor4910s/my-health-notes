@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Propositions d'Icônes ObsMed</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cabin+Sketch:wght@700&family=Dancing+Script:wght@700&display=swap');
+    
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f1f5f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 3rem;
+      color: #333;
+    }
+    
+    h1 { margin-bottom: 2rem; color: #1e293b; }
+
+    .proposals-container {
+      display: flex;
+      gap: 4rem;
+      margin-top: 2rem;
+    }
+
+    .proposal {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    /* The App Icon Square */
+    .app-icon {
+      width: 192px;
+      height: 192px;
+      border-radius: 40px; /* Standard squircle */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .app-icon img {
+      width: 70%;
+      height: 70%;
+      object-fit: contain;
+    }
+
+    /* Option 1: White Background */
+    .icon-white {
+      background: #ffffff;
+    }
+
+    /* Option 2: Red Gradient Background */
+    .icon-red {
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+    }
+    .icon-red img {
+      /* Turn the logo completely white */
+      filter: brightness(0) invert(1);
+    }
+
+    /* The Text Below the Icon (OS Label) */
+    .app-label {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #333;
+      letter-spacing: 0.5px;
+      /* Trying to emulate the app font if requested, but OS usually uses default font.
+         The user said "le O en majuscule, le M en majuscule...". 
+         If they want the specific brand font, we can show it: */
+    }
+
+    .brand-text {
+      display: flex;
+      align-items: baseline;
+    }
+    .brand-obs {
+      font-family: 'Cabin Sketch', cursive;
+      font-size: 1.4rem;
+      color: #1e293b;
+    }
+    .brand-med {
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.6rem;
+      color: #ef4444; /* or primary brown, but let's just make it look good */
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Propositions Finales : Icône ObsMed</h1>
+  <p>Voici les deux options respectant scrupuleusement vos consignes (le logo originel, pas de texte dans le carré).</p>
+
+  <div class="proposals-container">
+    
+    <!-- OPTION 1 -->
+    <div class="proposal">
+      <h3>Option 1 (Fond Blanc)</h3>
+      <div class="app-icon icon-white">
+        <img src="/logo.png" alt="Logo ObsMed">
+      </div>
+      <div class="brand-text">
+        <span class="brand-obs">Obs</span><span class="brand-med">Med</span>
+      </div>
+    </div>
+
+    <!-- OPTION 2 -->
+    <div class="proposal">
+      <h3>Option 2 (Fond Rouge)</h3>
+      <div class="app-icon icon-red">
+        <img src="/logo.png" alt="Logo ObsMed">
+      </div>
+      <div class="brand-text">
+        <span class="brand-obs">Obs</span><span class="brand-med">Med</span>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>
