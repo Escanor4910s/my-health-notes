@@ -1,3 +1,5 @@
+import { supabase } from '../lib/supabase';
+import { updateCustomCatalog } from '../lib/profile';
 import { useState, useEffect } from 'react';
 import { SYMPTOM_TYPES, SYMPTOM_FIELDS } from './symptomsConfig';
 
@@ -43,7 +45,13 @@ export function useSymptomCatalog() {
     setFields(newFields);
     
     localStorage.setItem('obsmed_custom_symptom_types', JSON.stringify(newTypes));
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session?.user?.id) updateCustomCatalog(session.user.id, 'symptom_types', newTypes);
+      });
     localStorage.setItem('obsmed_custom_symptom_fields', JSON.stringify(newFields));
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session?.user?.id) updateCustomCatalog(session.user.id, 'symptom_fields', newFields);
+      });
   };
 
   const updateTypeFields = (type, newFieldsArray) => {
@@ -54,6 +62,9 @@ export function useSymptomCatalog() {
     
     setFields(newFields);
     localStorage.setItem('obsmed_custom_symptom_fields', JSON.stringify(newFields));
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session?.user?.id) updateCustomCatalog(session.user.id, 'symptom_fields', newFields);
+      });
   };
 
   const getFields = (type) => {
@@ -73,7 +84,13 @@ export function useSymptomCatalog() {
     setFields(newFields);
     
     localStorage.setItem('obsmed_custom_symptom_types', JSON.stringify(newTypes));
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session?.user?.id) updateCustomCatalog(session.user.id, 'symptom_types', newTypes);
+      });
     localStorage.setItem('obsmed_custom_symptom_fields', JSON.stringify(newFields));
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session?.user?.id) updateCustomCatalog(session.user.id, 'symptom_fields', newFields);
+      });
     return true;
   };
 

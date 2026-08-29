@@ -89,6 +89,13 @@ export default function AccountModal({ onClose, session, currentPlan, onPlanChan
     localStorage.setItem('obsmed-lang', language);
     localStorage.setItem('obsmed-autosave', autoSave);
     localStorage.setItem('obsmed-export', exportFormat);
+    if (session?.user?.id) {
+      updateProfileSettings(session.user.id, {
+        language,
+        auto_save: autoSave,
+        export_format: exportFormat
+      });
+    }
     notify({ type: 'success', message: 'Paramètres enregistrés !' });
   };
 
@@ -98,8 +105,11 @@ export default function AccountModal({ onClose, session, currentPlan, onPlanChan
       const reader = new FileReader();
       reader.onloadend = () => {
         setAvatarUrl(reader.result);
-        localStorage.setItem('obsmed-avatar', reader.result);
-        notify({ type: 'success', message: 'Photo mise à jour !' });
+          localStorage.setItem('obsmed-avatar', reader.result);
+          if (session?.user?.id) {
+            updateProfileSettings(session.user.id, { avatar_url: reader.result });
+          }
+          notify({ type: 'success', message: 'Photo mise à jour !' });
       };
       reader.readAsDataURL(file);
     }
@@ -388,7 +398,11 @@ export default function AccountModal({ onClose, session, currentPlan, onPlanChan
                           <ImageIcon size={18} /> Télécharger
                         </button>
                         {avatarUrl && (
-                          <button onClick={() => { setAvatarUrl(''); localStorage.removeItem('obsmed-avatar'); }} style={{ background: '#f1f5f9', border: 'none', color: '#475569', cursor: 'pointer', borderRadius: '99px', padding: '0.6rem 1.5rem', fontWeight: '500', transition: 'all 0.2s' }} onMouseOver={e => e.currentTarget.style.color = '#ef4444'} onMouseOut={e => e.currentTarget.style.color = '#475569'}>
+                          <button onClick={() => { 
+        setAvatarUrl(''); 
+        localStorage.removeItem('obsmed-avatar'); 
+        if(session?.user?.id) updateProfileSettings(session.user.id, { avatar_url: null }); 
+    }} style={{ background: '#f1f5f9', border: 'none', color: '#475569', cursor: 'pointer', borderRadius: '99px', padding: '0.6rem 1.5rem', fontWeight: '500', transition: 'all 0.2s' }} onMouseOver={e => e.currentTarget.style.color = '#ef4444'} onMouseOut={e => e.currentTarget.style.color = '#475569'}>
                             Retirer
                           </button>
                         )}

@@ -1,3 +1,5 @@
+import { supabase } from '../lib/supabase';
+import { updateCustomCatalog } from '../lib/profile';
 import { useState, useEffect } from 'react';
 
 const DEFAULT_ANTECEDENTS = [
@@ -38,6 +40,9 @@ export function useAntecedentsCatalog() {
       } else {
         setCatalog(DEFAULT_ANTECEDENTS);
         localStorage.setItem('obsmed-antecedents-catalog', JSON.stringify(DEFAULT_ANTECEDENTS));
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session?.user?.id) updateCustomCatalog(session.user.id, 'antecedents', DEFAULT_ANTECEDENTS);
+      });
       }
     } catch (e) {
       console.error("Erreur lecture catalogue antécédents:", e);
@@ -61,6 +66,9 @@ export function useAntecedentsCatalog() {
       }
       const updated = [...prev, newEntry];
       localStorage.setItem('obsmed-antecedents-catalog', JSON.stringify(updated));
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session?.user?.id) updateCustomCatalog(session.user.id, 'antecedents', updated);
+      });
       return updated;
     });
     
@@ -77,6 +85,9 @@ export function useAntecedentsCatalog() {
     setCatalog(prev => {
       const updated = prev.filter(item => item.id !== idToRemove);
       localStorage.setItem('obsmed-antecedents-catalog', JSON.stringify(updated));
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session?.user?.id) updateCustomCatalog(session.user.id, 'antecedents', updated);
+      });
       return updated;
     });
   };
